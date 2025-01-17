@@ -12,6 +12,7 @@
         flat
         bordered
       >
+
         <template v-slot:body-cell-actions="props">
           <q-btn
             size="sm"
@@ -31,15 +32,25 @@
           />
         </template>
       </q-table>
-      <div>
+
+      <div v-if="loading">Carregando...</div>
+      <div v-if="error">Erro ao buscar livros: {{  error.message }}</div>
+
+      <div class="input-container">
+      <q-input
+      v-model="newBookTitle"
+      label="Novo Livro"
+      filled
+      style="max-width: 300px;"
+      />
 
       <q-input
-      v-model.number="model"
+      v-model="newAuthorId"
       type="number"
+      label="ID do Autor"
       filled
-      style="max-width: 200px; margin-top: 10px; "
+      style="max-width: 300px;"
       />
-      </div>
       <q-btn
         icon="add"
         label="Adicionar Livro"
@@ -47,34 +58,58 @@
         @click="addBook"
         class="q-mt-md"
       />
+      </div>
 
     </q-card-section>
   </q-card>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { GET_BOOKS } from '../apollo/books/query/bookQueries'
+import { useQuery } from '@vue/apollo-composable'
 
-const books = ref([
-  { id: 1, title: "Livro A", author: "Autor 1" },
-  { id: 2, title: "Livro B", author: "Autor 2" },
-  { id: 3, title: "Livro C", author: "Autor 3" },
-])
-
+const books = ref([])
 
 const columns = [
   {name: 'title', label: 'Livros', field: 'title', align: 'left'},
-  {name: 'author', label: 'Autores', field: 'author', align:'left'},
-  {name: 'actions', label: 'Ações', align: 'center'}
+  {name: 'author', label: 'Autores', field: row => row.author.name, align:'left'},
+  {name: 'actions', label: 'Ações', align: 'left'}
 ]
 
+const newBookTitle = ref('')
+const newAuthorId = ref(null)
+
+const { loading, error, data } = useQuery(GET_BOOKS)
+
+onMounted( async () => {
+  const { result } = await useQuery(GET_BOOKS)
+  console.log(result)
+  if(data && data.books) {
+    books.value = data.books
+  }
+
+})
+
 function addBook(){
-  const newId = books.value.length + 1;
-  books.value.push({id: newId, title: `Livro ${newId}`, author: `Autor ${newId}`})
+  if(!newBookTitle.value || !newAuthorId.value){
+    alert('Preencha todos os campos')
+    return;
+  }
+  const newId = books.value.length + 1
+  books.value.push({
+    id: newId,
+    title: newBookTitle.value,
+    author: `${newAuthorId.value}`
+  })
+
+  newBookTitle.value = ''
+  newAuthorId.value = null
 }
 
 function deleteBook(book) {
- alert(`deleting ${book.id}`)
+ books.value = books.value.filter((b) => b.id !== book.id)
+ alert(`Livro ${book.title} deletado`)
 }
 
 function editBook(book) {
@@ -83,7 +118,16 @@ function editBook(book) {
 
 </script>
 <style scoped>
-.q-table {
-  font-size: 1rem;
+.input-container{
+  display: flex;
+  align-items: center;
+  margin-top: 15px ;
+}
+.input-container > *{
+  margin-right: 10px;
+}
+
+.q-input, .q-btn{
+  height: 42px;
 }
 </style>

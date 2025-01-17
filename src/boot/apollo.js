@@ -4,6 +4,8 @@ import {
   InMemoryCache,
 } from "@apollo/client/core";
 
+import { provideApolloClient } from "@vue/apollo-composable";
+
 const httpLink = createHttpLink({
   uri: "http://localhost:3000/",
 });
@@ -15,4 +17,6 @@ const apolloClient = new ApolloClient({
   cache,
 });
 
-export default apolloClient;
+export default async () => {
+  provideApolloClient(apolloClient);
+};
