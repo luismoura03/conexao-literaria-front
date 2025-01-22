@@ -50,13 +50,18 @@ import EssentialLink from 'components/EssentialLink.vue'
 
 const linksList = [
   {
+    title: 'Home',
+    icon: 'home',
+    link: '/'
+  },
+  {
     title: 'Autores',
-    icon: '',
+    icon: 'person',
     link: '/authors'
   },
   {
     title: 'Livros',
-    icon: '',
+    icon: 'book',
     link: '/books'
   },
 ]
