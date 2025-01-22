@@ -17,7 +17,7 @@
             flat
             icon="edit"
             color="primary"
-            @click="editAuthor(props.row)"
+            @click="openEditDialog(props.row)"
             class="q-mr-sm"
           />
 
@@ -51,13 +51,44 @@
         />
       </div>
     </q-card-section>
+
+    <q-dialog v-model="isEditDialogOpen" persistent>
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Editar Autor</div>
+        </q-card-section>
+
+        <q-card-section>
+          <q-input
+          v-model="editAuthorData.id"
+          label="ID do Autor"
+          filled
+          disable
+          style="max-width: 300px;"
+          />
+        </q-card-section>
+        <q-card-section>
+          <q-input
+          v-model="editAuthorData.name"
+          label="Nome do Autor"
+          filled
+          style="max-width: 300px;"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Cancelar" color="primary" @click="closeEditDialog()" />
+          <q-btn flat label="Salvar" color="primary" @click="saveAuthorChanges()" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-card>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
 import { GET_AUTHORS } from '../apollo/authors/query/authorsQueries'
-import { CREATE_AUTHOR, DELETE_AUTHOR } from '../apollo/authors/mutations/index'
+import { CREATE_AUTHOR, DELETE_AUTHOR, UPDATE_AUTHOR } from '../apollo/authors/mutations/index'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 
 const columns = [
@@ -68,6 +99,8 @@ const columns = [
 
 const authors = ref([])
 const newAuthorName = ref('')
+const editAuthorData = ref({ id:'', name: '' })
+const isEditDialogOpen = ref(false)
 
 const loading = ref(false)
 const error = ref(null)
@@ -82,7 +115,6 @@ watch(
   () => resultAuthors.value,
   (newAuthors) => {
     if (newAuthors && newAuthors.authors) {
-      console.log(newAuthors)
       authors.value = newAuthors.authors
     }
   }
@@ -99,6 +131,14 @@ const { mutate: addAuthorMutation }  = useMutation(CREATE_AUTHOR, {
 const { mutate: deleteAuthorMutation } = useMutation(DELETE_AUTHOR, {
   onError: (mutationError) => {
     console.log('Erro ao deletar autor:', mutationError)
+    error.value = mutationError
+  },
+  onCompleted: () => loading.value = false,
+})
+
+const { mutate: updateAuthorMutation } = useMutation(UPDATE_AUTHOR, {
+  onError: (mutationError) => {
+    console.log('Erro ao atualizar autor:', mutationError)
     error.value = mutationError
   },
   onCompleted: () => loading.value = false,
@@ -152,10 +192,41 @@ const deleteAuthor = (author) => {
   })
 }
 
-function editAuthor(author){
-  alert(`Editar Autor ${author.name}`)
+const updateAuthor = (author) => {
+  console.log('Att autor com ID:', author.id)
+
+  loading.value = true
+  error.value = null
+
+  updateAuthorMutation({
+    id: author.id,
+    name: author.name
+  }).then((result) => {
+    if(result && result.data){
+      const updatedAuthor = result.data.updateAuthor;
+      authors.value = authors.value.map(a => a.id === updatedAuthor.id ? updatedAuthor : a)
+      editAuthorData.value = { id: '', name: ''}
+      isEditDialogOpen.value = false
+    }
+  }).catch((mutationError) => {
+    console.error('Erro ao atualizar autor:', mutationError)
+  })
+    loading.value = false
 }
 
+const openEditDialog = (author) => {
+  editAuthorData.value = { ...author }
+  isEditDialogOpen.value = true
+}
+
+const closeEditDialog = () => {
+  isEditDialogOpen.value = false
+  editAuthorData.value = { id: '', name: '' }
+}
+
+const saveAuthorChanges = () => {
+  updateAuthor(editAuthorData.value)
+}
 </script>
 
 <style scoped>
