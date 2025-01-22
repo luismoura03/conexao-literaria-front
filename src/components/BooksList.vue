@@ -34,7 +34,7 @@
       </q-table>
 
       <div v-if="loading">Carregando...</div>
-      <div v-if="error">Erro ao buscar livros: {{  error.message }}</div>
+      <div v-if="error">Erro ao buscar livros: {{ error.message }}</div>
 
       <div class="input-container">
       <q-input
@@ -55,7 +55,7 @@
         icon="add"
         label="Adicionar Livro"
         color="positive"
-        @click="addBook"
+        @click="addBook()"
         class="q-mt-md"
       />
       </div>
@@ -65,31 +65,38 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref, watch } from 'vue'
 import { GET_BOOKS } from '../apollo/books/query/bookQueries'
 import { useQuery } from '@vue/apollo-composable'
 
+//array que armazena a lista de livros
 const books = ref([])
 
+//define as colunas da tabela
 const columns = [
+  {name: 'id', label: 'ID', field: 'id', align: 'left'},
   {name: 'title', label: 'Livros', field: 'title', align: 'left'},
-  {name: 'author', label: 'Autores', field: row => row.author.name, align:'left'},
+  {name: 'author', label: 'Autores', field: row => row.author?.name, align:'left'},
   {name: 'actions', label: 'Ações', align: 'left'}
 ]
+
+//inputs para a criação de livros
 
 const newBookTitle = ref('')
 const newAuthorId = ref(null)
 
-const { loading, error, data } = useQuery(GET_BOOKS)
+//usa apollo composable(useQuery) para consultar livros do backend com a query GET_BOOKS
+const { loading, error, result } = useQuery(GET_BOOKS)
 
-onMounted( async () => {
-  const { result } = await useQuery(GET_BOOKS)
-  console.log(result)
-  if(data && data.books) {
-    books.value = data.books
+//tenta carregar os livros retornados pela query para a variavel books
+watch(
+  () => result.value,
+  (newBooks) => {
+    if (newBooks && newBooks.books) {
+      books.value = newBooks.books
+    }
   }
-
-})
+)
 
 function addBook(){
   if(!newBookTitle.value || !newAuthorId.value){
