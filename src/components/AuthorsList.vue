@@ -4,33 +4,12 @@
       <div class="text-h6">Lista de Autores</div>
     </q-card-section>
     <q-card-section>
-      <q-table
-        :rows="authors"
+      <AuthorsTable
+        :authors="authors"
         :columns="columns"
-        row-key="id"
-        flat
-        bordered
-      >
-        <template v-slot:body-cell-actions="props">
-          <q-btn
-            size="sm"
-            flat
-            icon="edit"
-            color="primary"
-            @click="openEditDialog(props.row)"
-            class="q-mr-sm"
-          />
-
-          <q-btn
-            size="sm"
-            flat
-            icon="delete"
-            color="negative"
-            @click="deleteAuthor(props.row)"
-            class="q-mr-sm"
-          />
-        </template>
-      </q-table>
+        @edit="openEditDialog"
+        @delete="deleteAuthor"
+      />
 
       <div v-if="loading">Carregando...</div>
       <div v-if="error">Erro ao buscar autores {{ error.message }}</div>
@@ -52,44 +31,22 @@
       </div>
     </q-card-section>
 
-    <q-dialog v-model="isEditDialogOpen" persistent>
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">Editar Autor</div>
-        </q-card-section>
-
-        <q-card-section>
-          <q-input
-          v-model="editAuthorData.id"
-          label="ID do Autor"
-          filled
-          disable
-          style="max-width: 300px;"
-          />
-        </q-card-section>
-        <q-card-section>
-          <q-input
-          v-model="editAuthorData.name"
-          label="Nome do Autor"
-          filled
-          style="max-width: 300px;"
-          />
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="Cancelar" color="primary" @click="closeEditDialog()" />
-          <q-btn flat label="Salvar" color="primary" @click="saveAuthorChanges()" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <EditAuthorDialog
+      :isOpen="isEditDialogOpen"
+      :authorData="editAuthorData"
+      @close="closeEditDialog"
+      @save="saveAuthorChanges"
+    />
   </q-card>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
-import { GET_AUTHORS } from '../apollo/authors/query/authorsQueries'
-import { CREATE_AUTHOR, DELETE_AUTHOR, UPDATE_AUTHOR } from '../apollo/authors/mutations/index'
+import { GET_AUTHORS } from '../graphql/queries/queriesAuthors/authorsQueries'
+import { CREATE_AUTHOR, DELETE_AUTHOR, UPDATE_AUTHOR } from '../graphql/mutations/mutationsAuthors/index'
 import { useQuery, useMutation } from '@vue/apollo-composable'
+import EditAuthorDialog from './EditDialog/EditAuthorDialog.vue'
+import AuthorsTable from './tables/AuthorsTable.vue'
 
 const columns = [
   {name: 'id', label: 'ID', field: 'id', align: 'left'},
@@ -101,7 +58,6 @@ const authors = ref([])
 const newAuthorName = ref('')
 const editAuthorData = ref({ id:'', name: '' })
 const isEditDialogOpen = ref(false)
-
 const loading = ref(false)
 const error = ref(null)
 
@@ -171,8 +127,6 @@ const addAuthor = () => {
 }
 
 const deleteAuthor = (author) => {
-  console.log('deletando author com o ID:', author.id)
-
   loading.value = true
   error.value = null
 
@@ -193,14 +147,14 @@ const deleteAuthor = (author) => {
 }
 
 const updateAuthor = (author) => {
-  console.log('Att autor com ID:', author.id)
+  console.log('Att autor com ID:', author)
 
   loading.value = true
   error.value = null
 
   updateAuthorMutation({
-    id: author.id,
-    name: author.name
+      id: author.id,
+      name: author.name
   }).then((result) => {
     if(result && result.data){
       const updatedAuthor = result.data.updateAuthor;
@@ -224,8 +178,8 @@ const closeEditDialog = () => {
   editAuthorData.value = { id: '', name: '' }
 }
 
-const saveAuthorChanges = () => {
-  updateAuthor(editAuthorData.value)
+const saveAuthorChanges = (updatedAuthorData) => {
+  updateAuthor(updatedAuthorData)
 }
 </script>
 

@@ -66,7 +66,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { GET_BOOKS } from '../apollo/books/query/bookQueries'
+import { GET_BOOKS } from '../graphql/queries/queriesBooks/bookQueries'
 import { useQuery } from '@vue/apollo-composable'
 
 //array que armazena a lista de livros
@@ -84,6 +84,7 @@ const columns = [
 
 const newBookTitle = ref('')
 const newAuthorId = ref(null)
+
 
 //usa apollo composable(useQuery) para consultar livros do backend com a query GET_BOOKS
 const { loading, error, result } = useQuery(GET_BOOKS)
