@@ -57,6 +57,7 @@ import { ref, watch } from 'vue'
 import { GET_BOOKS } from '../graphql/queries/queriesBooks/bookQueries'
 import { GET_AUTHORS } from '../graphql/queries/queriesAuthors/authorsQueries'
 import { CREATE_BOOK } from '../graphql/mutations/mutationsBooks/createBook'
+import { DELETE_BOOK } from '../graphql/mutations/mutationsBooks/deleteBook'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import BooksTable from './tables/BooksTable.vue'
 import EditBookDialog from './EditDialog/EditBookDialog.vue'
@@ -107,6 +108,15 @@ const { mutate: addBookMutation } = useMutation(CREATE_BOOK, {
   },
   onCompleted: () => loading.value = false
 })
+
+const { mutate: deleteBookMutation } = useMutation(DELETE_BOOK, {
+  onError: (mutationError) => {
+    console.error('Erro ao deletar livro:', mutationError)
+    error.value = mutationError
+  },
+  onCompleted: () => loading.value = false
+})
+
 //tenta carregar os livros retornados pela query para a variavel books
 watch(
   () => resultBooks.value,
@@ -126,11 +136,12 @@ watch(
         value: author.id,
         label: author.name
       }))
+      console.log('lita de livros new:', authors.value)
     }
   }
 )
 const addBook = () => {
-  console.log(newBookTitle.value, newBookAuthorId.value)
+  console.log(newBookTitle.value, newBookAuthorId.value )
   if(!newBookTitle.value|| !newBookAuthorId.value){
     alert('Preencha o titulo e o autor do livro')
     return
@@ -144,19 +155,18 @@ const addBook = () => {
 
    addBookMutation({
     title: newBookTitle.value,
-    author: newBookAuthorId.value
+    authorId: newBookAuthorId.value.value //extrair apenas o ID do autor
   }).then((result) => {
+    console.log("result retornado:",result)
     if (result && result.data){
+      console.log(result.data.createBook.id)
       books.value = [ ...books.value, {
-        id: result.data.createBook.value.id,
+        id: result.data.createBook.id,
         title: result.data.createBook.title,
         author: {
-          id: result.data.createBook.author.id,
           name: result.data.createBook.author.name
         }
       }]
-      newBookTitle.value = ''
-      newBookAuthorId.value = null
     }
     loading.value = false
   })
@@ -165,8 +175,22 @@ const addBook = () => {
   newBookAuthorId.value = null
 }
 
-const deleteBooks = () => {
-  alert('Deleting books')
+const deleteBooks = (book) => {
+  loading.value = true
+  error.value = null
+
+  deleteBookMutation({
+    id: book.id
+  }).then((result) => {
+    if(result && result.data) {
+    books.value = books.value.filter((b) => b.id !== book.id)
+    alert(`Livro ${book.title} removido!`)
+  }
+  loading.value = false
+  }).catch((mutationError) => {
+    console.error('Erro ao deletar livro:', mutationError)
+  })
+  loading.value = false
 }
 
 const openEditDialog = (book) => {
@@ -187,7 +211,6 @@ const saveBookChanges = (updatedBookData) => {
   }
 }
 
-// const { mutate: addBookMutation } = useMutation
 </script>
 <style scoped>
 .input-container{
