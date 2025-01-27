@@ -5,33 +5,13 @@
     </q-card-section>
     <q-separator />
     <q-card-section>
-      <q-table
-        :rows="books"
-        :columns="columns"
-        row-key="id"
-        flat
-        bordered
-      >
-
-        <template v-slot:body-cell-actions="props">
-          <q-btn
-            size="sm"
-            flat
-            icon="edit"
-            color="primary"
-            @click="editBook(props.row)"
-            class="q-mr-sm"
-          />
-          <q-btn
-            size="sm"
-            flat
-            icon="delete"
-            color="negative"
-            @click="deleteBook(props.row)"
-            class="q-mr-sm"
-          />
-        </template>
-      </q-table>
+      <BooksTable
+      :books="books"
+      :columns="columns"
+      :authors="authors"
+      @edit="openEditDialog"
+      @delete="deleteBooks"
+      />
 
       <div v-if="loading">Carregando...</div>
       <div v-if="error">Erro ao buscar livros: {{ error.message }}</div>
@@ -43,14 +23,15 @@
       filled
       style="max-width: 300px;"
       />
-
-      <q-input
-      v-model="newAuthorId"
-      type="number"
-      label="ID do Autor"
+      <div class="custom-select">
+      <q-select
+      v-model="newBookAuthorId"
+      :options="authorsOptions"
+      label="Selecione o Autor"
       filled
-      style="max-width: 300px;"
+      style="height: 42px;"
       />
+      </div>
       <q-btn
         icon="add"
         label="Adicionar Livro"
@@ -59,69 +40,175 @@
         class="q-mt-md"
       />
       </div>
-
     </q-card-section>
+    <EditBookDialog
+    :bookData="editBookData"
+    :authorsOptions="authorsOptions"
+    :isOpen="isEditDialogOpen"
+    @close="closeEditDialog"
+    @save="saveBookChanges"
+    />
+
   </q-card>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
 import { GET_BOOKS } from '../graphql/queries/queriesBooks/bookQueries'
-import { useQuery } from '@vue/apollo-composable'
+import { GET_AUTHORS } from '../graphql/queries/queriesAuthors/authorsQueries'
+import { CREATE_BOOK } from '../graphql/mutations/mutationsBooks/createBook'
+import { DELETE_BOOK } from '../graphql/mutations/mutationsBooks/deleteBook'
+import { useQuery, useMutation } from '@vue/apollo-composable'
+import BooksTable from './tables/BooksTable.vue'
+import EditBookDialog from './EditDialog/EditBookDialog.vue'
 
-//array que armazena a lista de livros
-const books = ref([])
-
-//define as colunas da tabela
 const columns = [
   {name: 'id', label: 'ID', field: 'id', align: 'left'},
   {name: 'title', label: 'Livros', field: 'title', align: 'left'},
-  {name: 'author', label: 'Autores', field: row => row.author?.name, align:'left'},
+  {name: 'author', label: 'Autores', field: row => row.author?.name ?? 'Desconhecido', align:'left'},
   {name: 'actions', label: 'Ações', align: 'left'}
 ]
 
-//inputs para a criação de livros
 
+const books = ref([])//lista de livros
+const authors = ref([])//lista de autores
+const authorsOptions = ref([])//lista de opções de autores para select
 const newBookTitle = ref('')
-const newAuthorId = ref(null)
+const newBookAuthorId = ref(null)
+const editBookData = ref({ id: '', title: '', authorId: '' })
+const isEditDialogOpen = ref(false)
+const loading = ref(false)
+const error = ref(null)
 
 
 //usa apollo composable(useQuery) para consultar livros do backend com a query GET_BOOKS
-const { loading, error, result } = useQuery(GET_BOOKS)
+const { result: resultBooks } = useQuery(GET_BOOKS, null, {
+  fetchPolicy: 'network-only',
+  onError: (error) => {
+    console.error('Erro ao buscar livros:', error)
+  },
+  onCompleted: () => loading.value = false
+})
 
-//tenta carregar os livros retornados pela query para a variavel books
-watch(
-  () => result.value,
-  (newBooks) => {
-    if (newBooks && newBooks.books) {
-      books.value = newBooks.books
+const {result: resultAuthors} = useQuery(GET_AUTHORS, null, {
+  fetchPolicy: 'network-only',
+  onError: (error) => {
+    console.error('Erro ao buscar autores:', error)
+  },
+  onCompleted: () => {
+    loading.value = false
     }
   }
 )
 
-function addBook(){
-  if(!newBookTitle.value || !newAuthorId.value){
-    alert('Preencha todos os campos')
-    return;
+const { mutate: addBookMutation } = useMutation(CREATE_BOOK, {
+  onError: (mutationError) => {
+    console.error('Erro ao adicionar livro:', mutationError)
+    error.value = mutationError
+  },
+  onCompleted: () => loading.value = false
+})
+
+const { mutate: deleteBookMutation } = useMutation(DELETE_BOOK, {
+  onError: (mutationError) => {
+    console.error('Erro ao deletar livro:', mutationError)
+    error.value = mutationError
+  },
+  onCompleted: () => loading.value = false
+})
+
+//tenta carregar os livros retornados pela query para a variavel books
+watch(
+  () => resultBooks.value,
+  (newBooks) => {
+    if (newBooks && newBooks.books) {
+      books.value = newBooks.books
+    }
+    console.log('lita de livros:', books.value )
   }
-  const newId = books.value.length + 1
-  books.value.push({
-    id: newId,
+)
+watch(
+  () => resultAuthors.value,
+  (newAuthors) => {
+    if(newAuthors && newAuthors.authors){
+      authors.value = newAuthors.authors
+      authorsOptions.value = newAuthors.authors.map(author => ({
+        value: author.id,
+        label: author.name
+      }))
+      console.log('lita de livros new:', authors.value)
+    }
+  }
+)
+const addBook = () => {
+  console.log(newBookTitle.value, newBookAuthorId.value )
+  if(!newBookTitle.value|| !newBookAuthorId.value){
+    alert('Preencha o titulo e o autor do livro')
+    return
+  }
+
+  console.log("adicionado livro com o titulo:", newBookTitle.value)
+  console.log("adicionado autor com o titulo:", newBookAuthorId.value)
+
+  loading.value = true
+  error.value = null
+
+   addBookMutation({
     title: newBookTitle.value,
-    author: `${newAuthorId.value}`
+    authorId: newBookAuthorId.value.value //extrair apenas o ID do autor
+  }).then((result) => {
+    console.log("result retornado:",result)
+    if (result && result.data){
+      console.log(result.data.createBook.id)
+      books.value = [ ...books.value, {
+        id: result.data.createBook.id,
+        title: result.data.createBook.title,
+        author: {
+          name: result.data.createBook.author.name
+        }
+      }]
+    }
+    loading.value = false
   })
 
   newBookTitle.value = ''
-  newAuthorId.value = null
+  newBookAuthorId.value = null
 }
 
-function deleteBook(book) {
- books.value = books.value.filter((b) => b.id !== book.id)
- alert(`Livro ${book.title} deletado`)
+const deleteBooks = (book) => {
+  loading.value = true
+  error.value = null
+
+  deleteBookMutation({
+    id: book.id
+  }).then((result) => {
+    if(result && result.data) {
+    books.value = books.value.filter((b) => b.id !== book.id)
+    alert(`Livro ${book.title} removido!`)
+  }
+  loading.value = false
+  }).catch((mutationError) => {
+    console.error('Erro ao deletar livro:', mutationError)
+  })
+  loading.value = false
 }
 
-function editBook(book) {
-  alert(`Editar Livro ${book.title}`)
+const openEditDialog = (book) => {
+  editBookData.value = { ...book }
+  isEditDialogOpen.value = true
+}
+
+const closeEditDialog = () => {
+  isEditDialogOpen.value = false
+  editBookData.value = ({ id: '', value: '', authorId: '' })
+}
+
+const saveBookChanges = (updatedBookData) => {
+  console.log('salvando dados:', updatedBookData)
+  const index = books.value.findIndex(b => b.id === updatedBookData.id)
+  if(index !== -1){
+    books.value[index] = updatedBookData
+  }
 }
 
 </script>
@@ -135,7 +222,12 @@ function editBook(book) {
   margin-right: 10px;
 }
 
-.q-input, .q-btn{
+.q-input, .q-btn, .q-select{
   height: 42px;
+}
+
+.custom-select {
+  width: 22%;
+  max-width: 300px;
 }
 </style>

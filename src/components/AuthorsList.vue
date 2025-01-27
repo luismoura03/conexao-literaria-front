@@ -136,7 +136,7 @@ const deleteAuthor = (author) => {
     if(result && result.data) {
     console.log(result.data)
       authors.value = authors.value.filter((a) => a.id !== author.id)
-    alert(`Autor ${author.name} removido`)
+    alert(`Autor ${author.name} removido!`)
     }
     loading.value = false
   }).catch((mutationError) => {

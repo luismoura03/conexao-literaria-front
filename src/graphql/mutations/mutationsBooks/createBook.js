@@ -1,6 +1,6 @@
 import { gql } from "graphql-tag";
 
-const CREATE_BOOK = gql`
+export const CREATE_BOOK = gql`
   mutation CreateBook($title: String!, $authorId: ID!) {
     createBook(title: $title, authorId: $authorId) {
       id
@@ -12,5 +12,3 @@ const CREATE_BOOK = gql`
     }
   }
 `;
-
-export default CREATE_BOOK;
