@@ -124,7 +124,6 @@ watch(
     if (newBooks && newBooks.books) {
       books.value = newBooks.books
     }
-    console.log('lita de livros:', books.value )
   }
 )
 watch(
@@ -136,19 +135,14 @@ watch(
         value: author.id,
         label: author.name
       }))
-      console.log('lita de livros new:', authors.value)
     }
   }
 )
 const addBook = () => {
-  console.log(newBookTitle.value, newBookAuthorId.value )
   if(!newBookTitle.value|| !newBookAuthorId.value){
     alert('Preencha o titulo e o autor do livro')
     return
   }
-
-  console.log("adicionado livro com o titulo:", newBookTitle.value)
-  console.log("adicionado autor com o titulo:", newBookAuthorId.value)
 
   loading.value = true
   error.value = null
@@ -157,9 +151,7 @@ const addBook = () => {
     title: newBookTitle.value,
     authorId: newBookAuthorId.value.value //extrair apenas o ID do autor
   }).then((result) => {
-    console.log("result retornado:",result)
     if (result && result.data){
-      console.log(result.data.createBook.id)
       books.value = [ ...books.value, {
         id: result.data.createBook.id,
         title: result.data.createBook.title,
@@ -204,7 +196,6 @@ const closeEditDialog = () => {
 }
 
 const saveBookChanges = (updatedBookData) => {
-  console.log('salvando dados:', updatedBookData)
   const index = books.value.findIndex(b => b.id === updatedBookData.id)
   if(index !== -1){
     books.value[index] = updatedBookData

@@ -48,12 +48,10 @@ watch(() => props.authorData, (newVal) => {
 }, { immediate: true })
 
 const closeDialog = () => {
-  console.log('Emitindo evento de fechar dialog')
   emit('close')
 }
 
 const saveChanges = () => {
-  console.log('Emitindo evento de salvar dados:', localAuthorData.value)
   emit('save', localAuthorData.value)
 }
 </script>
