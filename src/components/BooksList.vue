@@ -267,7 +267,7 @@ const saveBookChanges = (updatedBookData) => {
 }
 
 .custom-select {
-  width: 22%;
+  width: 15%;
   max-width: 300px;
 }
 </style>

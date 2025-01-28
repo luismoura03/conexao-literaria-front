@@ -5,25 +5,13 @@
         <div class="text-h6">Editar Livro</div>
       </q-card-section>
 
-      <q-card-section>
-        <q-input
-        v-model="localBookData.id"
-        label="ID do Livro"
-        filled
-        disable
-        style="max-width: 300px;"
-        />
-      </q-card-section>
-      <q-card-section>
+      <q-card-section class="row q-gutter-md">
         <q-input
         v-model="localBookData.title"
         label="Nome do Livro"
         filled
         style="max-width: 300px;"
         />
-      </q-card-section>
-
-      <q-card-section>
         <q-select
         v-model="localBookData.author"
         :options="authorsOptions"
