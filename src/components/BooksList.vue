@@ -42,9 +42,9 @@
       </div>
     </q-card-section>
     <EditBookDialog
+    :isOpen="isEditDialogOpen"
     :bookData="editBookData"
     :authorsOptions="authorsOptions"
-    :isOpen="isEditDialogOpen"
     @close="closeEditDialog"
     @save="saveBookChanges"
     />
@@ -58,6 +58,7 @@ import { GET_BOOKS } from '../graphql/queries/queriesBooks/bookQueries'
 import { GET_AUTHORS } from '../graphql/queries/queriesAuthors/authorsQueries'
 import { CREATE_BOOK } from '../graphql/mutations/mutationsBooks/createBook'
 import { DELETE_BOOK } from '../graphql/mutations/mutationsBooks/deleteBook'
+import { UPDATE_BOOK } from '../graphql/mutations/mutationsBooks/updateBook'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import BooksTable from './tables/BooksTable.vue'
 import EditBookDialog from './EditDialog/EditBookDialog.vue'
@@ -75,7 +76,14 @@ const authors = ref([])//lista de autores
 const authorsOptions = ref([])//lista de opções de autores para select
 const newBookTitle = ref('')
 const newBookAuthorId = ref(null)
-const editBookData = ref({ id: '', title: '', authorId: '' })
+const editBookData = ref({
+  id: '',
+  title: '',
+  author: {
+    value: '',
+    label: ''
+  }
+ })
 const isEditDialogOpen = ref(false)
 const loading = ref(false)
 const error = ref(null)
@@ -115,6 +123,14 @@ const { mutate: deleteBookMutation } = useMutation(DELETE_BOOK, {
     error.value = mutationError
   },
   onCompleted: () => loading.value = false
+})
+
+const { mutate: updateBookMutation } = useMutation(UPDATE_BOOK, {
+  onError: (mutationError) => {
+    console.log('Erro ao atualizar livro:', mutationError)
+    error.value = mutationError
+  },
+  onCompleted: () => loading.value = false,
 })
 
 //tenta carregar os livros retornados pela query para a variavel books
@@ -185,9 +201,40 @@ const deleteBooks = (book) => {
   loading.value = false
 }
 
+const updateBook = (book) => {
+
+  loading.value = true
+  error.value = null
+
+  updateBookMutation({
+      id: book.id,
+      title: book.title,
+      authorId: book.author.value
+  }).then((result) => {
+    if(result && result.data) {
+    const updatedBook = result.data.updateBook;
+    books.value = books.value.map((b) => b.id === updatedBook.id ? updatedBook : b)
+    editBookData.value = { id: '', title: '', authorId: '' }
+    isEditDialogOpen.value = false
+  }
+  loading.value = false
+  }).catch((mutationError) => {
+    console.error('Erro ao atualizar livro:', mutationError)
+  })
+}
+
 const openEditDialog = (book) => {
-  editBookData.value = { ...book }
-  isEditDialogOpen.value = true
+  if(book && book.author){
+    editBookData.value = {
+      id: book.id,
+      title: book.title,
+      author: {
+        value: book.author.id,
+        label: book.author.name
+      }
+   }
+   isEditDialogOpen.value = true
+  }
 }
 
 const closeEditDialog = () => {
@@ -196,11 +243,13 @@ const closeEditDialog = () => {
 }
 
 const saveBookChanges = (updatedBookData) => {
-  const index = books.value.findIndex(b => b.id === updatedBookData.id)
-  if(index !== -1){
-    books.value[index] = updatedBookData
+  if(updatedBookData.author && updatedBookData.author.value) {
+    updateBook(updatedBookData)
+  } else {
+    console.error('updatedBookData.author ou updatedBookData.author.value está indefinido')
   }
 }
+
 
 </script>
 <style scoped>

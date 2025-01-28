@@ -1,5 +1,5 @@
 <template>
-  <q-dialog :model-value:="isOpen" @update:model-value="closeDialog()" persistent>
+  <q-dialog :model-value="isOpen" @update:model-value="closeDialog" persistent>
     <q-card>
       <q-card-section>
         <div class="text-h6">Editar Livro</div>
@@ -13,19 +13,24 @@
         disable
         style="max-width: 300px;"
         />
+      </q-card-section>
+      <q-card-section>
         <q-input
         v-model="localBookData.title"
-        label="ID do Livro"
+        label="Nome do Livro"
         filled
-        disable
         style="max-width: 300px;"
         />
+      </q-card-section>
+
+      <q-card-section>
         <q-select
-        v-model="localBookData.authorId"
-        options="authorsOptions"
+        v-model="localBookData.author"
+        :options="authorsOptions"
         label="Autor do Livro"
+        options-value="value"
+        options-label="label"
         filled
-        disable
         style="max-width: 300px;"
         />
       </q-card-section>
@@ -49,10 +54,24 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'save'])
 
-const localBookData = ref({...props.bookData})
+const localBookData = ref({
+  id: props.bookData.id,
+  title: props.bookData.title,
+  author: {
+    value: props.bookData.authorId,
+    label: props.bookData.authorName
+  }
+})
 
 watch(() => props.bookData, (newVal) => {
-  localBookData.value = { ...newVal }
+  localBookData.value = {
+    id: newVal.id,
+    title: newVal.title,
+    author: {
+      value: newVal.authorId,
+      label: newVal.authorName
+    }
+   }
 }, {immediate: true})
 
 const closeDialog = () => {
@@ -60,6 +79,13 @@ const closeDialog = () => {
 }
 
 const saveChanges = () => {
-  emit('save', localBookData.value)
+  emit('save', {
+    id: localBookData.value.id,
+    title: localBookData.value.title,
+    author: {
+      value: localBookData.value.author.value,
+      label: localBookData.value.author.label
+    }
+  })
 }
 </script>
