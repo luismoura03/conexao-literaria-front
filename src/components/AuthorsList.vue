@@ -106,8 +106,6 @@ const addAuthor = () => {
     return
   }
 
-  console.log("adicionado autor com o nome:", newAuthorName.value)
-
   loading.value = true
   error.value = null
 
@@ -134,7 +132,6 @@ const deleteAuthor = (author) => {
       id: author.id
   }).then((result) => {
     if(result && result.data) {
-    console.log(result.data)
       authors.value = authors.value.filter((a) => a.id !== author.id)
     alert(`Autor ${author.name} removido!`)
     }
@@ -147,7 +144,6 @@ const deleteAuthor = (author) => {
 }
 
 const updateAuthor = (author) => {
-  console.log('Att autor com ID:', author)
 
   loading.value = true
   error.value = null
