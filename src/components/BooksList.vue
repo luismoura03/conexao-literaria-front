@@ -250,6 +250,7 @@ const saveBookChanges = (updatedBookData) => {
   }
 }
 
+
 </script>
 <style scoped>
 .input-container{
