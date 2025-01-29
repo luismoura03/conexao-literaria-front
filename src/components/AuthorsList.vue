@@ -8,7 +8,7 @@
         :authors="authors"
         :columns="columns"
         @edit="openEditDialog"
-        @delete="deleteAuthor"
+        @deleteAuthor="openDeleteDialog"
       />
 
       <div v-if="loading">Carregando...</div>
@@ -37,6 +37,14 @@
       @close="closeEditDialog"
       @save="saveAuthorChanges"
     />
+
+    <ConfirmDelete
+      :isOpen="isDeleteDialogOpen"
+      :item="selectedItem"
+      :itemType="selecteditemType"
+      @closeDialog="closeDeleteDialog"
+      @confirmDelete="handleDelete"
+    />
   </q-card>
 </template>
 
@@ -47,6 +55,7 @@ import { CREATE_AUTHOR, DELETE_AUTHOR, UPDATE_AUTHOR } from '../graphql/mutation
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import EditAuthorDialog from './EditDialog/EditAuthorDialog.vue'
 import AuthorsTable from './tables/AuthorsTable.vue'
+import ConfirmDelete from './ConfirmDelete/ConfirmDelete.vue'
 
 const columns = [
   {name: 'id', label: 'ID', field: 'id', align: 'left'},
@@ -58,6 +67,9 @@ const authors = ref([])
 const newAuthorName = ref('')
 const editAuthorData = ref({ id:'', name: '' })
 const isEditDialogOpen = ref(false)
+const isDeleteDialogOpen = ref(false)
+const selectedItem = ref(null)
+const selecteditemType = ref('')
 const loading = ref(false)
 const error = ref(null)
 
@@ -163,6 +175,8 @@ const updateAuthor = (author) => {
   })
     loading.value = false
 }
+//--------------------------------------------------------------------------------
+// Update the author
 
 const openEditDialog = (author) => {
   editAuthorData.value = { ...author }
@@ -177,6 +191,30 @@ const closeEditDialog = () => {
 const saveAuthorChanges = (updatedAuthorData) => {
   updateAuthor(updatedAuthorData)
 }
+
+//----------------------------------------------------------------
+//delete author
+const openDeleteDialog = (author) => {
+  console.log('delete', author)
+
+  selectedItem.value = author
+  selecteditemType.value = ''
+  isDeleteDialogOpen.value = true
+}
+
+const closeDeleteDialog = () => {
+  isDeleteDialogOpen.value = false
+  selectedItem.value = null
+  selecteditemType.value = ''
+}
+
+const handleDelete = (author) => {
+  console.log("handle on")
+  deleteAuthor(author)
+}
+
+
+
 </script>
 
 <style scoped>
