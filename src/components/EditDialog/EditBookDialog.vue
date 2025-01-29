@@ -4,8 +4,8 @@
       <q-card-section>
         <div class="text-h6">Editar Livro</div>
       </q-card-section>
-
-      <q-card-section class="row q-gutter-md">
+    <div class="modalEdit">
+      <q-card-section class="row q-gutter-lg">
         <q-input
         v-model="localBookData.title"
         label="Nome do Livro"
@@ -22,7 +22,7 @@
         style="max-width: 300px;"
         />
       </q-card-section>
-
+    </div>
       <q-card-actions align="right">
         <q-btn flat label="Cancelar" color="primary" @click="closeDialog" />
         <q-btn flat label="Salvar" color="primary" @click="saveChanges" />
@@ -77,3 +77,9 @@ const saveChanges = () => {
   })
 }
 </script>
+
+<style scoped>
+.q-select {
+  width: 215px;
+}
+</style>

@@ -4,25 +4,24 @@
         <q-card-section>
           <div class="text-h6">Editar Autor</div>
         </q-card-section>
+          <q-card-section>
+            <div class="row q-gutter-lg">
+            <q-input
+            v-model="localAuthorData.id"
+            label="ID do Autor"
+            filled
+            disable
+            style="max-width: 300px;"
+            />
 
-        <q-card-section>
-          <q-input
-          v-model="localAuthorData.id"
-          label="ID do Autor"
-          filled
-          disable
-          style="max-width: 300px;"
-          />
-        </q-card-section>
-        <q-card-section>
-          <q-input
-          v-model="localAuthorData.name"
-          label="Nome do Autor"
-          filled
-          style="max-width: 300px;"
-          />
-        </q-card-section>
-
+            <q-input
+            v-model="localAuthorData.name"
+            label="Nome do Autor"
+            filled
+            style="max-width: 300px;"
+            />
+            </div>
+          </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Cancelar" color="primary" @click="closeDialog" />
           <q-btn flat label="Salvar" color="primary" @click="saveChanges" />
@@ -55,3 +54,7 @@ const saveChanges = () => {
   emit('save', localAuthorData.value)
 }
 </script>
+
+<style scoped>
+
+</style>
