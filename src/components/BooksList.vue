@@ -48,7 +48,6 @@
     @close="closeEditDialog"
     @save="saveBookChanges"
     />
-
   </q-card>
 </template>
 

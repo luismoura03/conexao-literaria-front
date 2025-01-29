@@ -21,7 +21,7 @@
             flat
             icon="delete"
             color="negative"
-            @click="$emit('delete', props.row)"
+            @click="$emit('deleteAuthor', props.row)"
             class="q-mr-sm"
           />
         </template>
@@ -30,12 +30,12 @@
 
 <script setup>
 
-/* eslint-disable no-unused-vars */
-const props = defineProps({
+
+defineProps({
   authors: Array,
   columns: Array
 })
 
-const emit = defineEmits(['edit', 'delete'])
-/* eslint-enable no-unused-vars */
+defineEmits(['edit', 'deleteAuthor'])
+
 </script>
