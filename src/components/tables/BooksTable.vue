@@ -12,7 +12,7 @@
         flat
         icon="edit"
         color="primary"
-        @click="$emit('edit', props.row)"
+        @click="$emit('editBook', props.row)"
         class="q-mr-sm"
       />
       <q-btn
@@ -20,7 +20,7 @@
         flat
         icon="delete"
         color="negative"
-        @click="$emit('delete', props.row)"
+        @click="$emit('deleteBook', props.row)"
         class="q-mr-sm"
       />
     </template>
@@ -37,7 +37,7 @@ const props = defineProps({
     authors: Array
 })
 
-const emit = defineEmits(['edit', 'delete'])
+const emit = defineEmits(['editBook', 'deleteBook'])
 
 const booksWithAuthors = computed(() => {
   return props.books.map(book => {

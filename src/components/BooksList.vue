@@ -9,8 +9,8 @@
       :books="books"
       :columns="columns"
       :authors="authors"
-      @edit="openEditDialog"
-      @delete="deleteBooks"
+      @editBook="openEditDialog"
+      @deleteBook="openDeleteDialog"
       />
 
       <div v-if="loading">Carregando...</div>
@@ -48,6 +48,14 @@
     @close="closeEditDialog"
     @save="saveBookChanges"
     />
+    <ConfirmDelete
+    :isOpen="isDeleteDialogOpen"
+    :item="selectedItem"
+    :itemType="selecteditemType"
+    @closeDialog="closeDeleteDialog"
+    @confirmDelete="handleDelete"
+    />
+
   </q-card>
 </template>
 
@@ -61,6 +69,7 @@ import { UPDATE_BOOK } from '../graphql/mutations/mutationsBooks/updateBook'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import BooksTable from './tables/BooksTable.vue'
 import EditBookDialog from './EditDialog/EditBookDialog.vue'
+import ConfirmDelete from './ConfirmDelete/ConfirmDelete.vue'
 
 const columns = [
   {name: 'id', label: 'ID', field: 'id', align: 'left'},
@@ -70,9 +79,9 @@ const columns = [
 ]
 
 
-const books = ref([])//lista de livros
-const authors = ref([])//lista de autores
-const authorsOptions = ref([])//lista de opções de autores para select
+const books = ref([])
+const authors = ref([])
+const authorsOptions = ref([])
 const newBookTitle = ref('')
 const newBookAuthorId = ref(null)
 const editBookData = ref({
@@ -84,11 +93,14 @@ const editBookData = ref({
   }
  })
 const isEditDialogOpen = ref(false)
+const isDeleteDialogOpen = ref(false)
+const selectedItem = ref(null)
+const selecteditemType = ref('')
 const loading = ref(false)
 const error = ref(null)
 
 
-//usa apollo composable(useQuery) para consultar livros do backend com a query GET_BOOKS
+
 const { result: resultBooks } = useQuery(GET_BOOKS, null, {
   fetchPolicy: 'network-only',
   onError: (error) => {
@@ -132,27 +144,6 @@ const { mutate: updateBookMutation } = useMutation(UPDATE_BOOK, {
   onCompleted: () => loading.value = false,
 })
 
-//tenta carregar os livros retornados pela query para a variavel books
-watch(
-  () => resultBooks.value,
-  (newBooks) => {
-    if (newBooks && newBooks.books) {
-      books.value = newBooks.books
-    }
-  }
-)
-watch(
-  () => resultAuthors.value,
-  (newAuthors) => {
-    if(newAuthors && newAuthors.authors){
-      authors.value = newAuthors.authors
-      authorsOptions.value = newAuthors.authors.map(author => ({
-        value: author.id,
-        label: author.name
-      }))
-    }
-  }
-)
 const addBook = () => {
   if(!newBookTitle.value|| !newBookAuthorId.value){
     alert('Preencha o titulo e o autor do livro')
@@ -191,7 +182,6 @@ const deleteBooks = (book) => {
   }).then((result) => {
     if(result && result.data) {
     books.value = books.value.filter((b) => b.id !== book.id)
-    alert(`Livro ${book.title} removido!`)
   }
   loading.value = false
   }).catch((mutationError) => {
@@ -222,6 +212,9 @@ const updateBook = (book) => {
   })
 }
 
+//--------------------------------------------------------------------------------
+// Update the modal book
+
 const openEditDialog = (book) => {
   if(book && book.author){
     editBookData.value = {
@@ -248,6 +241,47 @@ const saveBookChanges = (updatedBookData) => {
     console.error('updatedBookData.author ou updatedBookData.author.value está indefinido')
   }
 }
+
+//----------------------------------------------------------------
+//delete book modal
+
+const openDeleteDialog = (book) => {
+  selectedItem.value = book
+  selecteditemType.value = ''
+  isDeleteDialogOpen.value = true
+}
+
+const closeDeleteDialog = () => {
+  isDeleteDialogOpen.value = false
+  selectedItem.value = null
+  selecteditemType.value = ''
+}
+
+const handleDelete = (book) => {
+  deleteBooks(book)
+  closeDeleteDialog()
+}
+
+watch(
+  () => resultBooks.value,
+  (newBooks) => {
+    if (newBooks && newBooks.books) {
+      books.value = newBooks.books
+    }
+  }
+)
+watch(
+  () => resultAuthors.value,
+  (newAuthors) => {
+    if(newAuthors && newAuthors.authors){
+      authors.value = newAuthors.authors
+      authorsOptions.value = newAuthors.authors.map(author => ({
+        value: author.id,
+        label: author.name
+      }))
+    }
+  }
+)
 
 
 </script>
