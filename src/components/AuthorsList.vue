@@ -7,7 +7,7 @@
       <AuthorsTable
         :authors="authors"
         :columns="columns"
-        @edit="openEditDialog"
+        @editAuthor="openEditDialog"
         @deleteAuthor="openDeleteDialog"
       />
 
