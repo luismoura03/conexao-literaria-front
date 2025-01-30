@@ -12,7 +12,7 @@
             flat
             icon="edit"
             color="primary"
-            @click="$emit('edit', props.row)"
+            @click="$emit('editAuthor', props.row)"
             class="q-mr-sm"
           />
 
@@ -36,6 +36,6 @@ defineProps({
   columns: Array
 })
 
-defineEmits(['edit', 'deleteAuthor'])
+defineEmits(['editAuthor', 'deleteAuthor'])
 
 </script>
