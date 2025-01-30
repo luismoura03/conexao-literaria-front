@@ -79,15 +79,6 @@ const { result: resultAuthors } = useQuery(GET_AUTHORS, null, {
   onCompleted: () => loading.value = false,
 })
 
-watch(
-  () => resultAuthors.value,
-  (newAuthors) => {
-    if (newAuthors && newAuthors.authors) {
-      authors.value = newAuthors.authors
-    }
-  }
-)
-
 const { mutate: addAuthorMutation }  = useMutation(CREATE_AUTHOR, {
   onError: (mutationError) => {
     console.log('Erro ao adicionar autor:', mutationError)
@@ -111,6 +102,15 @@ const { mutate: updateAuthorMutation } = useMutation(UPDATE_AUTHOR, {
   },
   onCompleted: () => loading.value = false,
 })
+
+watch(
+  () => resultAuthors.value,
+  (newAuthors) => {
+    if (newAuthors && newAuthors.authors) {
+      authors.value = newAuthors.authors
+    }
+  }
+)
 
 const addAuthor = () => {
   if(!newAuthorName.value){
@@ -145,12 +145,10 @@ const deleteAuthor = (author) => {
   }).then((result) => {
     if(result && result.data) {
       authors.value = authors.value.filter((a) => a.id !== author.id)
-    alert(`Autor ${author.name} removido!`)
     }
     loading.value = false
   }).catch((mutationError) => {
     console.error('Erro ao deletar autor:', mutationError)
-    alert('Erro ao deletar autor')
     loading.value = false
   })
 }
@@ -176,7 +174,7 @@ const updateAuthor = (author) => {
     loading.value = false
 }
 //--------------------------------------------------------------------------------
-// Update the author
+// Update the author modal
 
 const openEditDialog = (author) => {
   editAuthorData.value = { ...author }
@@ -193,7 +191,7 @@ const saveAuthorChanges = (updatedAuthorData) => {
 }
 
 //----------------------------------------------------------------
-//delete author
+//delete author modal
 const openDeleteDialog = (author) => {
   console.log('delete', author)
 
@@ -209,8 +207,8 @@ const closeDeleteDialog = () => {
 }
 
 const handleDelete = (author) => {
-  console.log("handle on")
   deleteAuthor(author)
+  closeDeleteDialog()
 }
 
 

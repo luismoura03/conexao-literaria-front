@@ -2,7 +2,7 @@
   <q-dialog :model-value="isOpen" @update:model-value="closeDialog" persistent>
       <q-card>
         <q-card-section>
-          <div class="text-h6">Tem certeza que deseja deletar o autor "{{ item?.name}}" ?</div>
+          <div class="text-h6">Tem certeza que deseja deletar o item "{{ item?.name || item?.title}}" ?</div>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Cancelar" color="primary" @click="closeDialog" />
