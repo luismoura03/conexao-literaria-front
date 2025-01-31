@@ -190,25 +190,25 @@ const deleteBooks = (book) => {
   loading.value = false
 }
 
-const updateBook = (book) => {
+const updateBook = async (book) => {
 
   loading.value = true
   error.value = null
 
-  updateBookMutation({
+  return updateBookMutation({
       id: book.id,
       title: book.title,
-      authorId: book.author.value
+      authorId: book.authorId,
   }).then((result) => {
-    if(result && result.data) {
-    const updatedBook = result.data.updateBook;
-    books.value = books.value.map((b) => b.id === updatedBook.id ? updatedBook : b)
-    editBookData.value = { id: '', title: '', authorId: '' }
-    isEditDialogOpen.value = false
+    if(result?.data) {
+    books.value = books.value.map((b) => b.id === result.data.updateBook.id ? result.data.updateBook : b)
   }
-  loading.value = false
+  return result //permite encadear then posteriormente
   }).catch((mutationError) => {
     console.error('Erro ao atualizar livro:', mutationError)
+    throw error; //propaga o erro para ser captudaro em saveBookChanges
+  }).finally(() => {
+    loading.value = false
   })
 }
 
@@ -216,6 +216,8 @@ const updateBook = (book) => {
 // Update the modal book
 
 const openEditDialog = (book) => {
+  console.log('Open edit dialog', book)
+  console.log('Authors Options before opning Dialogs',authorsOptions.value)
   if(book && book.author){
     editBookData.value = {
       id: book.id,
@@ -231,17 +233,27 @@ const openEditDialog = (book) => {
 
 const closeEditDialog = () => {
   isEditDialogOpen.value = false
-  editBookData.value = ({ id: '', value: '', authorId: '' })
+  editBookData.value = ({ id: '', title: '', author: { value: '', label: '', } })
 }
 
-const saveBookChanges = (updatedBookData) => {
-  if(updatedBookData.author && updatedBookData.author.value) {
-    updateBook(updatedBookData)
-  } else {
-    console.error('updatedBookData.author ou updatedBookData.author.value está indefinido')
+const saveBookChanges = async (updatedBookData) => {
+  try {
+    if (!updatedBookData.author?.value) {
+      throw new Error('Selecione um autor')
+  }
+
+  const variables = {
+    id: updatedBookData.id,
+    title: updatedBookData.title,
+    authorId: updatedBookData.author.value
+  }
+
+  await updateBook(variables)
+  closeEditDialog()
+  } catch (error) {
+    console.error('Erro ao atualizar:', error)
   }
 }
-
 //----------------------------------------------------------------
 //delete book modal
 
@@ -253,8 +265,14 @@ const openDeleteDialog = (book) => {
 
 const closeDeleteDialog = () => {
   isDeleteDialogOpen.value = false
-  selectedItem.value = null
-  selecteditemType.value = ''
+  editBookData.value = {
+    id: '',
+    title: '',
+    author: {
+      value: '',
+      label: ''
+    }
+  }
 }
 
 const handleDelete = (book) => {
@@ -278,9 +296,11 @@ watch(
       authorsOptions.value = newAuthors.authors.map(author => ({
         value: author.id,
         label: author.name
+
       }))
+      console.log(resultAuthors.value)
     }
-  }
+  },
 )
 
 

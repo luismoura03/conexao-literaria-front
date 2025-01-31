@@ -45,10 +45,7 @@ const emit = defineEmits(['close', 'save'])
 const localBookData = ref({
   id: props.bookData.id,
   title: props.bookData.title,
-  author: {
-    value: props.bookData.authorId,
-    label: props.bookData.authorName
-  }
+  author: props.bookData.author || {value: '', label: '',}
 })
 
 watch(() => props.bookData, (newVal) => {
@@ -56,11 +53,12 @@ watch(() => props.bookData, (newVal) => {
     id: newVal.id,
     title: newVal.title,
     author: {
-      value: newVal.authorId,
-      label: newVal.authorName
+      value: newVal.author.value,
+      label: newVal.author.label
     }
    }
-}, {immediate: true})
+   console.log('updated book data', localBookData.value.author.value)
+})
 
 const closeDialog = () => {
   emit('close')
@@ -75,6 +73,7 @@ const saveChanges = () => {
       label: localBookData.value.author.label
     }
   })
+  console.log('Local: ', localBookData.value)
 }
 </script>
 
