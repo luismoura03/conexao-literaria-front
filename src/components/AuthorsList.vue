@@ -53,6 +53,7 @@ import { ref, watch } from 'vue'
 import { GET_AUTHORS } from '../graphql/queries/queriesAuthors/authorsQueries'
 import { CREATE_AUTHOR, DELETE_AUTHOR, UPDATE_AUTHOR } from '../graphql/mutations/mutationsAuthors/index'
 import { useQuery, useMutation } from '@vue/apollo-composable'
+import { useQuasar } from 'quasar'
 import EditAuthorDialog from './EditDialog/EditAuthorDialog.vue'
 import AuthorsTable from './tables/AuthorsTable.vue'
 import ConfirmDelete from './ConfirmDelete/ConfirmDelete.vue'
@@ -67,6 +68,7 @@ const authors = ref([])
 const newAuthorName = ref('')
 const editAuthorData = ref({ id:'', name: '' })
 const isEditDialogOpen = ref(false)
+const $q = useQuasar()
 const isDeleteDialogOpen = ref(false)
 const selectedItem = ref(null)
 const selecteditemType = ref('')
@@ -114,7 +116,14 @@ watch(
 
 const addAuthor = () => {
   if(!newAuthorName.value){
-    alert('Preencha todos os campos')
+    $q.notify({
+      position: 'bottom-right',
+      color: 'negative',
+      message: 'Por favor, preencha todos os campos!',
+      icon: 'error',
+      classes: 'custom-notify',
+      iconSize: '30px'
+    })
     return
   }
 
@@ -131,6 +140,14 @@ const addAuthor = () => {
     }]
       newAuthorName.value = ''
     }
+    $q.notify({
+      position: 'bottom-right',
+      color: 'positive',
+      message: 'Autor adicionado com sucesso!',
+      icon: 'done',
+      classes: 'custom-notify',
+      iconSize: '30px'
+    })
     loading.value = false
   })
 
@@ -147,6 +164,14 @@ const deleteAuthor = (author) => {
       authors.value = authors.value.filter((a) => a.id !== author.id)
     }
     loading.value = false
+    $q.notify({
+      position:'bottom-right',
+      color: 'positive',
+      message: 'Autor deletado com sucesso!',
+      icon: 'done',
+      classes: 'custom-notify',
+      iconSize: '30px'
+    })
   }).catch((mutationError) => {
     console.error('Erro ao deletar autor:', mutationError)
     loading.value = false
@@ -168,6 +193,14 @@ const updateAuthor = (author) => {
       editAuthorData.value = { id: '', name: ''}
       isEditDialogOpen.value = false
     }
+    $q.notify({
+      position: 'bottom-right',
+      color: 'positive',
+      message: 'Autor atualizado com sucesso!',
+      icon: 'done',
+      classes: 'custom-notify',
+      iconSize: '30px'
+    })
   }).catch((mutationError) => {
     console.error('Erro ao atualizar autor:', mutationError)
   })
