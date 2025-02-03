@@ -8,6 +8,7 @@
   </q-page>
 </template>
 
+
 <script setup>
 import AuthorsList from '../components/AuthorsList.vue'
 

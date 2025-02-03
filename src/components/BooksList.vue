@@ -1,61 +1,59 @@
 <template>
   <q-card flat bordered class="q-pa-md">
     <q-card-section>
-        <div class="text-h6">Lista de Livros</div>
+      <div class="text-h6">Lista de Livros</div>
     </q-card-section>
     <q-separator />
     <q-card-section>
       <BooksTable
-      :books="books"
-      :columns="columns"
-      :authors="authors"
-      @editBook="openEditDialog"
-      @deleteBook="openDeleteDialog"
+        :books="books"
+        :columns="columns"
+        :authors="authors"
+        @editBook="openEditDialog"
+        @deleteBook="openDeleteDialog"
       />
 
       <div v-if="loading">Carregando...</div>
       <div v-if="error">Erro ao buscar livros: {{ error.message }}</div>
 
       <div class="input-container">
-      <q-input
-      v-model="newBookTitle"
-      label="Novo Livro"
-      filled
-      style="max-width: 300px;"
-      />
-      <div class="custom-select">
-      <q-select
-      v-model="newBookAuthorId"
-      :options="authorsOptions"
-      label="Selecione o Autor"
-      filled
-      style="height: 42px;"
-      />
-      </div>
-      <q-btn
-        icon="add"
-        label="Adicionar Livro"
-        color="positive"
-        @click="addBook()"
-        class="q-mt-md"
-      />
+        <q-input
+          v-model="newBookTitle"
+          label="Novo Livro"
+          filled
+        />
+        <div class="custom-select">
+          <q-select
+            v-model="newBookAuthorId"
+            :options="authorsOptions"
+            label="Selecione o Autor"
+            filled
+            style="height: 42px;"
+          />
+        </div>
+        <q-btn
+          icon="add"
+          label="Adicionar Livro"
+          color="positive"
+          @click="addBook()"
+          class="q-mt-md"
+        />
       </div>
     </q-card-section>
     <EditBookDialog
-    :isOpen="isEditDialogOpen"
-    :bookData="editBookData"
-    :authorsOptions="authorsOptions"
-    @close="closeEditDialog"
-    @save="saveBookChanges"
+      :isOpen="isEditDialogOpen"
+      :bookData="editBookData"
+      :authorsOptions="authorsOptions"
+      @close="closeEditDialog"
+      @save="saveBookChanges"
     />
     <ConfirmDelete
-    :isOpen="isDeleteDialogOpen"
-    :item="selectedItem"
-    :itemType="selecteditemType"
-    @closeDialog="closeDeleteDialog"
-    @confirmDelete="handleDelete"
+      :isOpen="isDeleteDialogOpen"
+      :item="selectedItem"
+      :itemType="selecteditemType"
+      @closeDialog="closeDeleteDialog"
+      @confirmDelete="handleDelete"
     />
-
   </q-card>
 </template>
 
@@ -147,7 +145,7 @@ const { mutate: updateBookMutation } = useMutation(UPDATE_BOOK, {
 })
 
 const addBook = () => {
-  if(!newBookTitle.value|| !newBookAuthorId.value){
+  if(!newBookTitle.value || !newBookAuthorId.value){
     $q.notify({
       position:'bottom-right',
       color: 'negative',
@@ -354,6 +352,6 @@ watch(
 
 .custom-select {
   width: 15%;
-  max-width: 300px;
+  max-width: 200px;
 }
 </style>
