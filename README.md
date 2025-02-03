@@ -1,6 +1,6 @@
 📂 Estrutura do Projeto - Quasar App
 
-Este documento descreve a estrutura do projeto Quasar App e a finalidade de cada pasta e arquivo.
+Este documento descreve a estrutura do projeto Crud-Books e a finalidade de cada pasta e arquivo.
 
 📁 Estrutura de Pastas
 
