@@ -122,7 +122,7 @@ const addAuthor = () => {
       message: 'Por favor, preencha todos os campos!',
       icon: 'error',
       classes: 'custom-notify',
-      iconSize: '30px'
+      iconSize: '40px'
     })
     return
   }
@@ -146,7 +146,7 @@ const addAuthor = () => {
       message: 'Autor adicionado com sucesso!',
       icon: 'done',
       classes: 'custom-notify',
-      iconSize: '30px'
+      iconSize: '40px'
     })
     loading.value = false
   })
@@ -170,7 +170,7 @@ const deleteAuthor = (author) => {
       message: 'Autor deletado com sucesso!',
       icon: 'done',
       classes: 'custom-notify',
-      iconSize: '30px'
+      iconSize: '40px'
     })
   }).catch((mutationError) => {
     console.error('Erro ao deletar autor:', mutationError)
@@ -199,7 +199,7 @@ const updateAuthor = (author) => {
       message: 'Autor atualizado com sucesso!',
       icon: 'done',
       classes: 'custom-notify',
-      iconSize: '30px'
+      iconSize: '25px'
     })
   }).catch((mutationError) => {
     console.error('Erro ao atualizar autor:', mutationError)

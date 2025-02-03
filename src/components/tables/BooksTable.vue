@@ -1,10 +1,10 @@
 <template>
   <q-table
-        :rows="books"
-        :columns="columns"
-        row-key="id"
-        flat
-        bordered
+    :rows="books"
+    :columns="columns"
+    row-key="id"
+    flat
+    bordered
   >
     <template v-slot:body-cell-actions="props">
       <q-btn

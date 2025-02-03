@@ -1,32 +1,33 @@
 <template>
   <q-table
-        :rows="authors"
-        :columns="columns"
-        row-key="id"
+    :rows="authors"
+    :columns="columns"
+    row-key="id"
+    flat
+    bordered
+  >
+    <template v-slot:body-cell-actions="props">
+      <q-btn
+        size="sm"
         flat
-        bordered
-      >
-        <template v-slot:body-cell-actions="props">
-          <q-btn
-            size="sm"
-            flat
-            icon="edit"
-            color="primary"
-            @click="$emit('editAuthor', props.row)"
-            class="q-mr-sm"
-          />
+        icon="edit"
+        color="primary"
+        @click="$emit('editAuthor', props.row)"
+        class="q-mr-sm"
+      />
 
-          <q-btn
-            size="sm"
-            flat
-            icon="delete"
-            color="negative"
-            @click="$emit('deleteAuthor', props.row)"
-            class="q-mr-sm"
-          />
-        </template>
-      </q-table>
+      <q-btn
+        size="sm"
+        flat
+        icon="delete"
+        color="negative"
+        @click="$emit('deleteAuthor', props.row)"
+        class="q-mr-sm"
+      />
+    </template>
+  </q-table>
 </template>
+
 
 <script setup>
 
