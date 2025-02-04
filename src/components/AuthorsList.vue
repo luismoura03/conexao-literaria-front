@@ -1,7 +1,18 @@
 <template>
   <q-card flat bordered class="q-pa-md">
     <q-card-section>
-      <div class="text-h6">Lista de Autores</div>
+      <div class="header-table row items-center justify-content">
+        <div class="text-h6 q-mr-md">Lista de Autores</div>
+        <div class="addBook">
+          <q-btn
+            icon="add"
+            label="Adicionar Autor"
+            color="positive"
+            @click="openAddDialog"
+            class="q-mt-md"
+          />
+        </div>
+      </div>
     </q-card-section>
     <q-card-section>
       <AuthorsTable
@@ -14,21 +25,7 @@
       <div v-if="loading">Carregando...</div>
       <div v-if="error">Erro ao buscar autores {{ error.message }}</div>
 
-      <div class="input-container">
-        <q-input
-          v-model="newAuthorName"
-          label="Novo Autor"
-          filled
-          style="max-width: 300px;"
-        />
-        <q-btn
-          icon="add"
-          label="Adicionar Autor"
-          color="positive"
-          @click="addAuthor()"
-          class="q-mt-md"
-        />
-      </div>
+
     </q-card-section>
 
     <EditAuthorDialog
@@ -37,13 +34,17 @@
       @close="closeEditDialog"
       @save="saveAuthorChanges"
     />
-
     <ConfirmDelete
       :isOpen="isDeleteDialogOpen"
       :item="selectedItem"
       :itemType="selecteditemType"
       @closeDialog="closeDeleteDialog"
       @confirmDelete="handleDelete"
+    />
+    <AddAuthorDialog
+      :isOpen="isAddDialogOpen"
+      @close="closeAddDialog"
+      @save="handleAddDialog"
     />
   </q-card>
 </template>
@@ -57,6 +58,7 @@ import { useQuasar } from 'quasar'
 import EditAuthorDialog from './EditDialog/EditAuthorDialog.vue'
 import AuthorsTable from './tables/AuthorsTable.vue'
 import ConfirmDelete from './ConfirmDelete/ConfirmDelete.vue'
+import AddAuthorDialog from './AddDialog/AddAuthorDialog.vue'
 
 const columns = [
   {name: 'id', label: 'ID', field: 'id', align: 'left'},
@@ -65,11 +67,11 @@ const columns = [
 ]
 
 const authors = ref([])
-const newAuthorName = ref('')
 const editAuthorData = ref({ id:'', name: '' })
 const isEditDialogOpen = ref(false)
 const $q = useQuasar()
 const isDeleteDialogOpen = ref(false)
+const isAddDialogOpen = ref(false)
 const selectedItem = ref(null)
 const selecteditemType = ref('')
 const loading = ref(false)
@@ -114,43 +116,31 @@ watch(
   }
 )
 
-const addAuthor = () => {
-  if(!newAuthorName.value){
+const handleAddDialog = (newAuthor) => {
+  addAuthorMutation({
+    name: newAuthor.name
+  }).then((result) => {
+    if(!result?.data?.createAuthor){
+      alert("Error")
+    }
+    if(result?.data?.createAuthor) {
+      authors.value = [...authors.value, result.data.createAuthor]
+      $q.notify({
+        position: 'bottom-right',
+        color: 'positive',
+        message: 'Autor adicionado com sucesso!',
+        icon: 'done'
+      })
+    }
+    closeAddDialog()
+  }).catch((mutationError) => {
     $q.notify({
       position: 'bottom-right',
       color: 'negative',
-      message: 'Por favor, preencha todos os campos!',
-      icon: 'error',
-      classes: 'custom-notify',
-      iconSize: '40px'
+      message: 'Ao adicionar autor: ' + mutationError.message,
+      icon: 'error'
     })
-    return
-  }
-
-  loading.value = true
-  error.value = null
-
-  addAuthorMutation({
-      name: newAuthorName.value,
-  }).then((result) => {
-    if(result && result.data) {
-    authors.value = [...authors.value, {
-      id: result.data.createAuthor.id,
-      name: result.data.createAuthor.name,
-    }]
-      newAuthorName.value = ''
-    }
-    $q.notify({
-      position: 'bottom-right',
-      color: 'positive',
-      message: 'Autor adicionado com sucesso!',
-      icon: 'done',
-      classes: 'custom-notify',
-      iconSize: '40px'
-    })
-    loading.value = false
   })
-
 }
 
 const deleteAuthor = (author) => {
@@ -202,7 +192,12 @@ const updateAuthor = (author) => {
       iconSize: '25px'
     })
   }).catch((mutationError) => {
-    console.error('Erro ao atualizar autor:', mutationError)
+    $q.notify({
+      position: 'bottom-right',
+      color: 'negative',
+      message: 'Ao adicionar author: ' + mutationError.message,
+      icon: 'error'
+    })
   })
     loading.value = false
 }
@@ -244,19 +239,36 @@ const handleDelete = (author) => {
   closeDeleteDialog()
 }
 
+//--------------------------------------------------------------------------------
+// Add new author
+
+const openAddDialog = () => {
+  isAddDialogOpen.value = true
+}
+
+const closeAddDialog = () => {
+  isAddDialogOpen.value = false
+}
 
 
 </script>
 
 <style scoped>
-.input-container {
+.header-table {
   display: flex;
   align-items: center;
-  margin-top: 15px
+  justify-content: space-between;
+
 }
 
-.input-container > * {
-  margin-right: 10px
+.addBook {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.text-h6 {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .q-input, .q-btn {
