@@ -133,11 +133,11 @@ const handleAddDialog = (newAuthor) => {
       })
     }
     closeAddDialog()
-  }).catch((error) => {
+  }).catch((mutationError) => {
     $q.notify({
       position: 'bottom-right',
       color: 'negative',
-      message: 'Ao adicionar author: ' + error.message,
+      message: 'Ao adicionar autor: ' + mutationError.message,
       icon: 'error'
     })
   })
@@ -192,7 +192,12 @@ const updateAuthor = (author) => {
       iconSize: '25px'
     })
   }).catch((mutationError) => {
-    console.error('Erro ao atualizar autor:', mutationError)
+    $q.notify({
+      position: 'bottom-right',
+      color: 'negative',
+      message: 'Ao adicionar author: ' + mutationError.message,
+      icon: 'error'
+    })
   })
     loading.value = false
 }
