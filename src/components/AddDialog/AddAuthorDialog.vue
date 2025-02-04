@@ -11,12 +11,13 @@
             label="Nome do Autor"
             filled
             style="max-width: 300px;"
+
           />
         </div>
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="Cancelar" color="primary" @click="closeDialog" />
-        <q-btn flat label="Criar" color="green" @click="saveChanges"  />
+        <q-btn flat label="Criar" color="green" @click="saveChanges" :disabled="localAuthorData.name.trim()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
