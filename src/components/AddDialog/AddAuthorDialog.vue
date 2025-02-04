@@ -1,6 +1,6 @@
 <template>
   <q-dialog :model-value="isOpen" @update:model-value="closeDialog()" persistent>
-    <q-card>
+    <q-card class="q-pa-sm">
       <q-card-section>
         <div class="text-h6">Adicionar Autor</div>
       </q-card-section>
@@ -10,14 +10,13 @@
             v-model="localAuthorData.name"
             label="Nome do Autor"
             filled
-            style="max-width: 300px;"
-
+            style="max-width: 200px;"
           />
         </div>
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="Cancelar" color="primary" @click="closeDialog" />
-        <q-btn flat label="Criar" color="green" @click="saveChanges" :disabled="localAuthorData.name.trim()" />
+        <q-btn flat label="Criar" color="green" @click="saveChanges" :disabled="!localAuthorData.name.trim()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
