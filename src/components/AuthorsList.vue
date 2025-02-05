@@ -13,6 +13,7 @@
           />
         </div>
       </div>
+      <q-separator></q-separator>
     </q-card-section>
     <q-card-section>
       <AuthorsTable
@@ -305,8 +306,8 @@ const closeAddDialog = () => {
   vertical-align: middle;
 }
 
-.q-input,
 .q-btn {
-  height: 42px;
+  height: 30px;
+  margin: 15px;
 }
 </style>
