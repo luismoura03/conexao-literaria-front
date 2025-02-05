@@ -1,7 +1,7 @@
 <template>
   <q-card flat bordered class="q-pa-md">
     <q-card-section>
-      <div class="header-table row items-center justify-content">
+      <div class="header-table">
         <div class="text-h6 q-mr-md">Lista de Autores</div>
         <div class="addBook">
           <q-btn
@@ -42,7 +42,7 @@
     <AddAuthorDialog
       :isOpen="isAddDialogOpen"
       @close="closeAddDialog"
-      @save="handleAddDialog"
+      @save="addDialog"
     />
   </q-card>
 </template>
@@ -118,7 +118,22 @@ watch(
   }
 );
 
-const handleAddDialog = (newAuthor) => {
+const addDialog = (newAuthor) => {
+
+  const authorExist = authors.value.some(
+    (author) => author.name.toLowerCase().trim() === newAuthor.name.toLowerCase().trim()
+  )
+
+  if(authorExist) {
+    $q.notify({
+      position: 'bottom-right',
+      color: 'warning',
+      message:'Este autor já está cadastrado!',
+      icon: 'warning'
+    })
+    return
+  }
+
   addAuthorMutation({
     name: newAuthor.name,
   })
@@ -177,6 +192,19 @@ const deleteAuthor = (author) => {
 const updateAuthor = (author) => {
   loading.value = true;
   error.value = null;
+
+  const originalAuthor = authors.value.find(a => a.id === author.id)
+
+  if(originalAuthor.name.trim() === author.name.trim()) {
+    $q.notify({
+      position: 'bottom-right',
+      color: 'warning',
+      message: 'Nenhuma alteração detectada no nome do autor.',
+      icon: 'warning'
+    })
+    loading.value = false;
+    return
+  }
 
   updateAuthorMutation({
     id: author.id,
