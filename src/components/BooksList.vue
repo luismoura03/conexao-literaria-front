@@ -2,6 +2,13 @@
   <q-card flat bordered class="q-pa-md">
     <q-card-section>
       <div class="text-h6">Lista de Livros</div>
+      <q-btn
+          icon="add"
+          label="Adicionar Livro"
+          color="positive"
+          @click="openAddDialog()"
+          class="q-mt-md"
+        />
     </q-card-section>
     <q-separator />
     <q-card-section>
@@ -16,7 +23,7 @@
       <div v-if="loading">Carregando...</div>
       <div v-if="error">Erro ao buscar livros: {{ error.message }}</div>
 
-      <div class="input-container">
+      <!-- <div class="input-container">
         <q-input
           v-model="newBookTitle"
           label="Novo Livro"
@@ -31,14 +38,7 @@
             style="height: 42px;"
           />
         </div>
-        <q-btn
-          icon="add"
-          label="Adicionar Livro"
-          color="positive"
-          @click="addBook()"
-          class="q-mt-md"
-        />
-      </div>
+      </div> -->
     </q-card-section>
     <EditBookDialog
       :isOpen="isEditDialogOpen"
@@ -53,6 +53,12 @@
       :itemType="selecteditemType"
       @closeDialog="closeDeleteDialog"
       @confirmDelete="handleDelete"
+    />
+    <AddBookDialog
+    :isOpen="isAddDialogOpen"
+    :authorsOptions="authorsOptions"
+    @close="closeAddDialog"
+    @save="addBook"
     />
   </q-card>
 </template>
@@ -69,6 +75,7 @@ import { useQuasar } from 'quasar'
 import BooksTable from './tables/BooksTable.vue'
 import EditBookDialog from './EditDialog/EditBookDialog.vue'
 import ConfirmDelete from './ConfirmDelete/ConfirmDelete.vue'
+import AddBookDialog from './AddDialog/AddBookDialog.vue'
 
 const columns = [
   {name: 'id', label: 'ID', field: 'id', align: 'left'},
@@ -81,8 +88,6 @@ const columns = [
 const books = ref([])
 const authors = ref([])
 const authorsOptions = ref([])
-const newBookTitle = ref('')
-const newBookAuthorId = ref(null)
 const editBookData = ref({
   id: '',
   title: '',
@@ -93,6 +98,7 @@ const editBookData = ref({
  })
 const isEditDialogOpen = ref(false)
 const isDeleteDialogOpen = ref(false)
+const isAddDialogOpen = ref(false)
 const selectedItem = ref(null)
 const selecteditemType = ref('')
 const $q = useQuasar()
@@ -122,7 +128,7 @@ const {result: resultAuthors} = useQuery(GET_AUTHORS, null, {
 
 const { mutate: addBookMutation } = useMutation(CREATE_BOOK, {
   onError: (mutationError) => {
-    console.error('Erro ao adicionar livro:', mutationError)
+    console.error('Erro ao adicionar livro: linha 1', mutationError)
     error.value = mutationError
   },
   onCompleted: () => loading.value = false
@@ -144,27 +150,26 @@ const { mutate: updateBookMutation } = useMutation(UPDATE_BOOK, {
   onCompleted: () => loading.value = false,
 })
 
-const addBook = () => {
-  if(!newBookTitle.value || !newBookAuthorId.value){
+const addBook = (bookData) => {
+  if(!bookData.title || !bookData.authorId){
     $q.notify({
-      position:'bottom-right',
+      position: 'bottom-right',
       color: 'negative',
-      message: 'Por favor, preencha todos os campos!',
-      icon: 'error',
-      classes: 'custom-notify',
-      iconSize: '30px'
-    })
-    return
+      message: 'Preencha todos os campos!',
+      icon: 'error'
+    });
+    console.log(bookData.title, bookData.authorId)
+    return;
   }
 
   loading.value = true
   error.value = null
 
    addBookMutation({
-    title: newBookTitle.value,
-    authorId: newBookAuthorId.value.value //extrair apenas o ID do autor
+    title: bookData.title,
+    authorId: bookData.authorId
   }).then((result) => {
-    if (result && result.data){
+    if (result?.data?.createBook){
       books.value = [ ...books.value, {
         id: result.data.createBook.id,
         title: result.data.createBook.title,
@@ -182,10 +187,9 @@ const addBook = () => {
       iconSize: '30px'
     })
     loading.value = false
+  }).catch((mutationError) => {
+    console.error('Erro ao adicionar livro:', mutationError)
   })
-
-  newBookTitle.value = ''
-  newBookAuthorId.value = null
 }
 
 const deleteBooks = (book) => {
@@ -333,7 +337,16 @@ watch(
     }
   },
 )
+//--------------------------------------------------------------------------------
+// close and save book dialog
 
+const openAddDialog = () => {
+  isAddDialogOpen.value = true
+}
+
+const closeAddDialog = () => {
+  isAddDialogOpen.value = false
+}
 
 </script>
 <style scoped>
