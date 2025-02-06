@@ -2,8 +2,10 @@
   <q-card flat bordered class="q-pa-md">
     <q-card-section>
       <div class="header-table">
-        <div class="text-h6 q-mr-md">Lista de Autores</div>
-        <div class="addBook">
+        <div class="text-header">
+          <div class="text-h6 q-mr-md">Lista de Autores</div>
+        </div>
+        <div class="addAuthor">
           <q-btn
             icon="add"
             label="Adicionar Autor"
@@ -297,18 +299,9 @@ const closeAddDialog = () => {
   justify-content: space-between;
 }
 
-.addBook {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.text-h6 {
-  display: inline-block;
-  vertical-align: middle;
-}
-
 .q-btn {
   height: 30px;
   margin: 15px;
 }
+
 </style>
