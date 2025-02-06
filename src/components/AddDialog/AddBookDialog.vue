@@ -25,7 +25,7 @@
       </div>
       <q-card-actions align="right">
         <q-btn flat label="Cancelar" color="primary" @click="closeDialog" />
-        <q-btn flat label="Salvar" icon="add" color="green" @click="saveChanges" />
+        <q-btn flat label="Criar" icon="add" color="green" @click="saveChanges" />
       </q-card-actions>
     </q-card>
   </q-dialog>

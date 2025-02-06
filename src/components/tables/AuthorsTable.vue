@@ -60,7 +60,7 @@ defineEmits(['editAuthor', 'deleteAuthor'])
   height: 100%;
 }
 
-.q-tbn {
+.q-btn {
   min-width: 36px;
   height: 36px
 }

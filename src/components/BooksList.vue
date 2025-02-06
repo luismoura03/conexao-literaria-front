@@ -1,16 +1,22 @@
 <template>
   <q-card flat bordered class="q-pa-md">
     <q-card-section>
-      <div class="text-h6">Lista de Livros</div>
-      <q-btn
-          icon="add"
-          label="Adicionar Livro"
-          color="positive"
-          @click="openAddDialog()"
-          class="q-mt-md"
-        />
+      <div class="header-container">
+        <div class="text-header">
+          <div class="text-h6 q-mr-md">Lista de Livros</div>
+        </div>
+        <div class="add-book">
+          <q-btn
+              icon="add"
+              label="Adicionar Livro"
+              color="positive"
+              @click="openAddDialog()"
+              class="q-mt-md"
+            />
+        </div>
+      </div>
+      <q-separator />
     </q-card-section>
-    <q-separator />
     <q-card-section>
       <BooksTable
         :books="books"
@@ -23,22 +29,6 @@
       <div v-if="loading">Carregando...</div>
       <div v-if="error">Erro ao buscar livros: {{ error.message }}</div>
 
-      <!-- <div class="input-container">
-        <q-input
-          v-model="newBookTitle"
-          label="Novo Livro"
-          filled
-        />
-        <div class="custom-select">
-          <q-select
-            v-model="newBookAuthorId"
-            :options="authorsOptions"
-            label="Selecione o Autor"
-            filled
-            style="height: 42px;"
-          />
-        </div>
-      </div> -->
     </q-card-section>
     <EditBookDialog
       :isOpen="isEditDialogOpen"
@@ -350,21 +340,22 @@ const closeAddDialog = () => {
 
 </script>
 <style scoped>
-.input-container{
+.header-container {
   display: flex;
   align-items: center;
-  margin-top: 15px ;
-}
-.input-container > *{
-  margin-right: 10px;
+  justify-content: space-between;
 }
 
-.q-input, .q-btn, .q-select{
-  height: 42px;
+.add-book{
+  display: inline-block;
 }
 
-.custom-select {
-  width: 15%;
-  max-width: 200px;
+.text-header {
+  display: inline-block;
+}
+
+.q-btn {
+  height: 30px;
+  margin: 15px;
 }
 </style>
