@@ -43,7 +43,7 @@
     <AddAuthorDialog
       :isOpen="isAddDialogOpen"
       @close="closeAddDialog"
-      @save="addDialog"
+      @save="addAuthor"
     />
   </q-card>
 </template>
@@ -119,7 +119,7 @@ watch(
   }
 );
 
-const addDialog = (newAuthor) => {
+const addAuthor = (newAuthor) => {
 
   const authorExist = authors.value.some(
     (author) => author.name.toLowerCase().trim() === newAuthor.name.toLowerCase().trim()
@@ -128,10 +128,11 @@ const addDialog = (newAuthor) => {
   if(authorExist) {
     $q.notify({
       position: 'bottom-right',
-      color: 'warning',
+      color: 'blue',
       message:'Este autor já está cadastrado!',
-      icon: 'warning'
+      icon: 'info'
     })
+    closeAddDialog();
     return
   }
 
@@ -278,7 +279,7 @@ const handleDelete = (author) => {
 };
 
 //--------------------------------------------------------------------------------
-// Add new author
+// close and save book dialog
 
 const openAddDialog = () => {
   isAddDialogOpen.value = true;

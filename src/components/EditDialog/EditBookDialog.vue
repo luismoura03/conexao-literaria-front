@@ -10,7 +10,6 @@
             v-model="localBookData.title"
             label="Nome do Livro"
             filled
-            style="max-width: 300px;"
           />
           <q-select
             v-model="localBookData.author"
@@ -19,7 +18,6 @@
             option-value="value"
             option-label="label"
             filled
-            style="max-width: 300px;"
           />
         </q-card-section>
       </div>
@@ -80,6 +78,7 @@ const saveChanges = () => {
 
 <style scoped>
 .q-select {
+  max-width: 215px;
   width: 215px;
 }
 </style>
