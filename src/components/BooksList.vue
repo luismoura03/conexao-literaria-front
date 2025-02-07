@@ -152,9 +152,9 @@ const addBook = (newBook) => {
     })
     return
   }
-  if(newBook.title.trim() === '') {
+  if(newBook.title.trim() === '' || newBook.authorId.trim() === '') {
     notifyInfo({
-      message: 'O nome do livro não pode ser vazio!',
+      message: 'O nome do livro e autor não pode ser vazio!',
     })
     return
   }
@@ -206,6 +206,16 @@ const updateBook = async (book) => {
   loading.value = true
   error.value = null
 
+  const originalBook = books.value.find((b) => b.id === book.id)
+
+  if(originalBook.title.trim() === book.title.trim() || originalBook.authorId === book.authorId) {
+    notifyInfo({
+      message: 'Nenhuma alteração detectada no nome do livro e autor.',
+    })
+    loading.value = false
+    return
+  }
+
   return updateBookMutation({
       id: book.id,
       title: book.title,
@@ -220,7 +230,7 @@ const updateBook = async (book) => {
   return result
   }).catch((mutationError) => {
     console.error('Erro ao atualizar livro:', mutationError)
-    throw error; //propaga o erro para ser captudaro em saveBookChanges
+    throw error;
   }).finally(() => {
     loading.value = false
   })

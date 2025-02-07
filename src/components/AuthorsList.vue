@@ -135,9 +135,10 @@ const addAuthor = (newAuthor) => {
     return
   }
   if(newAuthor.name.trim() === '') {
-    notifyWarning({
+    notifyInfo({
       message: 'O nome do autor não pode ser vazio!',
     })
+    closeAddDialog()
     return
   }
 
