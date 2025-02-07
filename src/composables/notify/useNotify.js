@@ -31,8 +31,8 @@ export default function useNotify() {
   }
   function notifyError({
     message,
-    color = "blue",
-    icon = "info",
+    color = "negative",
+    icon = "warning",
     position = "bottom-right",
   }) {
     $q.notify({
