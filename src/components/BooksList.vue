@@ -1,21 +1,27 @@
 <template>
   <q-card flat bordered class="q-pa-md">
     <q-card-section>
-      <div class="text-h6">Lista de Livros</div>
-      <q-btn
-          icon="add"
-          label="Adicionar Livro"
-          color="positive"
-          @click="openAddDialog()"
-          class="q-mt-md"
-        />
+      <div class="header-container">
+        <div class="text-header">
+          <div class="text-h6 q-mr-md">Lista de Livros</div>
+        </div>
+        <div class="add-book">
+          <q-btn
+              icon="add"
+              label="Adicionar Livro"
+              color="positive"
+              @click="openAddDialog()"
+              class="q-mt-md"
+          />
+        </div>
+      </div>
+      <q-separator />
     </q-card-section>
-    <q-separator />
     <q-card-section>
       <BooksTable
-        :books="books"
-        :columns="columns"
-        :authors="authors"
+        :books
+        :columns
+        :authors
         @editBook="openEditDialog"
         @deleteBook="openDeleteDialog"
       />
@@ -23,22 +29,6 @@
       <div v-if="loading">Carregando...</div>
       <div v-if="error">Erro ao buscar livros: {{ error.message }}</div>
 
-      <!-- <div class="input-container">
-        <q-input
-          v-model="newBookTitle"
-          label="Novo Livro"
-          filled
-        />
-        <div class="custom-select">
-          <q-select
-            v-model="newBookAuthorId"
-            :options="authorsOptions"
-            label="Selecione o Autor"
-            filled
-            style="height: 42px;"
-          />
-        </div>
-      </div> -->
     </q-card-section>
     <EditBookDialog
       :isOpen="isEditDialogOpen"
@@ -71,7 +61,7 @@ import { CREATE_BOOK } from '../graphql/mutations/mutationsBooks/createBook'
 import { DELETE_BOOK } from '../graphql/mutations/mutationsBooks/deleteBook'
 import { UPDATE_BOOK } from '../graphql/mutations/mutationsBooks/updateBook'
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import { useQuasar } from 'quasar'
+import useNotify from '/src/composables/notify/useNotify.js'
 import BooksTable from './tables/BooksTable.vue'
 import EditBookDialog from './EditDialog/EditBookDialog.vue'
 import ConfirmDelete from './ConfirmDelete/ConfirmDelete.vue'
@@ -101,7 +91,7 @@ const isDeleteDialogOpen = ref(false)
 const isAddDialogOpen = ref(false)
 const selectedItem = ref(null)
 const selecteditemType = ref('')
-const $q = useQuasar()
+const { notifyInfo, notifySucess } = useNotify()
 const loading = ref(false)
 const error = ref(null)
 
@@ -150,24 +140,28 @@ const { mutate: updateBookMutation } = useMutation(UPDATE_BOOK, {
   onCompleted: () => loading.value = false,
 })
 
-const addBook = (bookData) => {
-  if(!bookData.title || !bookData.authorId){
-    $q.notify({
-      position: 'bottom-right',
-      color: 'negative',
-      message: 'Preencha todos os campos!',
-      icon: 'error'
-    });
-    console.log(bookData.title, bookData.authorId)
-    return;
+const addBook = (newBook) => {
+
+  const bookExist = books.value.some(
+    (book) => book.title.toLowerCase().trim() === newBook.title.toLowerCase().trim()
+  )
+
+  if(bookExist) {
+    notifyInfo({
+      message: 'Esse livro já está cadastrado!',
+    })
+    return
+  }
+  if(newBook.title.trim() === '' || newBook.authorId.trim() === '') {
+    notifyInfo({
+      message: 'O nome do livro e autor não pode ser vazio!',
+    })
+    return
   }
 
-  loading.value = true
-  error.value = null
-
    addBookMutation({
-    title: bookData.title,
-    authorId: bookData.authorId
+    title: newBook.title,
+    authorId: newBook.authorId
   }).then((result) => {
     if (result?.data?.createBook){
       books.value = [ ...books.value, {
@@ -178,13 +172,8 @@ const addBook = (bookData) => {
         }
       }]
     }
-    $q.notify({
-      position: 'bottom-right',
-      color: 'positive',
+    notifySucess({
       message: 'Livro adicionado com sucesso!',
-      icon: 'done',
-      classes: 'custom-notify',
-      iconSize: '30px'
     })
     loading.value = false
   }).catch((mutationError) => {
@@ -203,13 +192,8 @@ const deleteBooks = (book) => {
     books.value = books.value.filter((b) => b.id !== book.id)
   }
   loading.value = false
-  $q.notify({
-      position: 'bottom-right',
-      color: 'positive',
+  notifySucess({
       message: 'Livro deletado com sucesso!',
-      icon: 'done',
-      classes: 'custom-notify',
-      iconSize: '30px'
     })
   }).catch((mutationError) => {
     console.error('Erro ao deletar livro:', mutationError)
@@ -222,6 +206,16 @@ const updateBook = async (book) => {
   loading.value = true
   error.value = null
 
+  const originalBook = books.value.find((b) => b.id === book.id)
+
+  if(originalBook.title.trim() === book.title.trim() || originalBook.authorId === book.authorId) {
+    notifyInfo({
+      message: 'Nenhuma alteração detectada no nome do livro e autor.',
+    })
+    loading.value = false
+    return
+  }
+
   return updateBookMutation({
       id: book.id,
       title: book.title,
@@ -230,18 +224,13 @@ const updateBook = async (book) => {
     if(result?.data) {
     books.value = books.value.map((b) => b.id === result.data.updateBook.id ? result.data.updateBook : b)
   }
-  $q.notify({
-      position: 'bottom-right',
-      color: 'positive',
+  notifySucess({
       message: 'Livro atualizado com sucesso!',
-      icon: 'done',
-      classes: 'custom-notify',
-      iconSize: '30px'
     })
   return result
   }).catch((mutationError) => {
     console.error('Erro ao atualizar livro:', mutationError)
-    throw error; //propaga o erro para ser captudaro em saveBookChanges
+    throw error;
   }).finally(() => {
     loading.value = false
   })
@@ -350,21 +339,22 @@ const closeAddDialog = () => {
 
 </script>
 <style scoped>
-.input-container{
+.header-container {
   display: flex;
   align-items: center;
-  margin-top: 15px ;
-}
-.input-container > *{
-  margin-right: 10px;
+  justify-content: space-between;
 }
 
-.q-input, .q-btn, .q-select{
-  height: 42px;
+.add-book{
+  display: inline-block;
 }
 
-.custom-select {
-  width: 15%;
-  max-width: 200px;
+.text-header {
+  display: inline-block;
+}
+
+.q-btn {
+  height: 30px;
+  margin: 15px;
 }
 </style>

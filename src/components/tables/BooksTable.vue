@@ -7,22 +7,26 @@
     bordered
   >
     <template v-slot:body-cell-actions="props">
-      <q-btn
-        size="sm"
-        flat
-        icon="edit"
-        color="primary"
-        @click="$emit('editBook', props.row)"
-        class="q-mr-sm"
-      />
-      <q-btn
-        size="sm"
-        flat
-        icon="delete"
-        color="negative"
-        @click="$emit('deleteBook', props.row)"
-        class="q-mr-sm"
-      />
+      <q-td :props="props" class="actions-cell">
+        <div class="actions-container">
+          <q-btn
+            size="sm"
+            flat
+            icon="edit"
+            color="primary"
+            @click="$emit('editBook', props.row)"
+            class="q-mr-sm"
+          />
+          <q-btn
+            size="sm"
+            flat
+            icon="delete"
+            color="negative"
+            @click="$emit('deleteBook', props.row)"
+            class="q-mr-sm"
+          />
+        </div>
+      </q-td>
     </template>
   </q-table>
 </template>
@@ -49,3 +53,22 @@ const booksWithAuthors = computed(() => {
   })
 })
 </script>
+
+<style scoped>
+.actions-cell {
+  width: 10px
+}
+
+.actions-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
+.q-btn {
+  min-width: 36px;
+  height: 36px;
+}
+</style>

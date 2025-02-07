@@ -16,7 +16,7 @@
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="Cancelar" color="primary" @click="closeDialog" />
-        <q-btn flat label="Criar"  color="green" icon="add"  @click="saveChanges" :disabled="!localAuthorData.name.trim()" />
+        <q-btn flat label="Criar"  color="green" icon="add"  @click="saveChanges" />
       </q-card-actions>
     </q-card>
   </q-dialog>
