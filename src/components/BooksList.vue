@@ -12,16 +12,16 @@
               color="positive"
               @click="openAddDialog()"
               class="q-mt-md"
-            />
+          />
         </div>
       </div>
       <q-separator />
     </q-card-section>
     <q-card-section>
       <BooksTable
-        :books="books"
-        :columns="columns"
-        :authors="authors"
+        :books
+        :columns
+        :authors
         @editBook="openEditDialog"
         @deleteBook="openDeleteDialog"
       />

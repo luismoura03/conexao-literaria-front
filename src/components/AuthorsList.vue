@@ -59,7 +59,7 @@ import {
   UPDATE_AUTHOR,
 } from '../graphql/mutations/mutationsAuthors/index';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import { useQuasar } from 'quasar';
+import useNotify from '../composables/notify/useNotify.js'
 import EditAuthorDialog from './EditDialog/EditAuthorDialog.vue';
 import AuthorsTable from './tables/AuthorsTable.vue';
 import ConfirmDelete from './ConfirmDelete/ConfirmDelete.vue';
@@ -74,7 +74,7 @@ const columns = [
 const authors = ref([]);
 const editAuthorData = ref({ id: '', name: '' });
 const isEditDialogOpen = ref(false);
-const $q = useQuasar();
+const { notifyError, notifyInfo, notifyWarning, notifySucess } = useNotify();
 const isDeleteDialogOpen = ref(false);
 const isAddDialogOpen = ref(false);
 const selectedItem = ref(null);
@@ -128,11 +128,8 @@ const addAuthor = (newAuthor) => {
   )
 
   if(authorExist) {
-    $q.notify({
-      position: 'bottom-right',
-      color: 'blue',
+    notifyInfo({
       message:'Este autor já está cadastrado!',
-      icon: 'info'
     })
     closeAddDialog();
     return
@@ -147,21 +144,15 @@ const addAuthor = (newAuthor) => {
       }
       if (result?.data?.createAuthor) {
         authors.value = [...authors.value, result.data.createAuthor];
-        $q.notify({
-          position: 'bottom-right',
-          color: 'positive',
+        notifySucess({
           message: 'Autor adicionado com sucesso!',
-          icon: 'done',
         });
       }
       closeAddDialog();
     })
     .catch((mutationError) => {
-      $q.notify({
-        position: 'bottom-right',
-        color: 'negative',
+      notifyError({
         message: 'Ao adicionar autor: ' + mutationError.message,
-        icon: 'error',
       });
     });
 };
@@ -178,13 +169,8 @@ const deleteAuthor = (author) => {
         authors.value = authors.value.filter((a) => a.id !== author.id);
       }
       loading.value = false;
-      $q.notify({
-        position: 'bottom-right',
-        color: 'positive',
+      notifySucess({
         message: 'Autor deletado com sucesso!',
-        icon: 'done',
-        classes: 'custom-notify',
-        iconSize: '40px',
       });
     })
     .catch((mutationError) => {
@@ -200,11 +186,8 @@ const updateAuthor = (author) => {
   const originalAuthor = authors.value.find(a => a.id === author.id)
 
   if(originalAuthor.name.trim() === author.name.trim()) {
-    $q.notify({
-      position: 'bottom-right',
-      color: 'warning',
+    notifyWarning({
       message: 'Nenhuma alteração detectada no nome do autor.',
-      icon: 'warning'
     })
     loading.value = false;
     return
@@ -223,17 +206,12 @@ const updateAuthor = (author) => {
         editAuthorData.value = { id: '', name: '' };
         isEditDialogOpen.value = false;
       }
-      $q.notify({
-        position: 'bottom-right',
-        color: 'positive',
+      notifySucess({
         message: 'Autor atualizado com sucesso!',
-        icon: 'done',
-        classes: 'custom-notify',
-        iconSize: '25px',
       });
     })
     .catch((mutationError) => {
-      $q.notify({
+      notifyError({
         position: 'bottom-right',
         color: 'negative',
         message: 'Ao adicionar autor: ' + mutationError.message,
@@ -284,7 +262,7 @@ const handleDelete = (author) => {
 // close and save book dialog
 
 const openAddDialog = () => {
-  isAddDialogOpen.value = true;
+  isAddDialogOpen.value = !isAddDialogOpen.value;
 };
 
 const closeAddDialog = () => {
