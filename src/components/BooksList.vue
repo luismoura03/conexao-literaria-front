@@ -61,7 +61,7 @@ import { CREATE_BOOK } from '../graphql/mutations/mutationsBooks/createBook'
 import { DELETE_BOOK } from '../graphql/mutations/mutationsBooks/deleteBook'
 import { UPDATE_BOOK } from '../graphql/mutations/mutationsBooks/updateBook'
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import { useQuasar } from 'quasar'
+import useNotify from '/src/composables/notify/useNotify.js'
 import BooksTable from './tables/BooksTable.vue'
 import EditBookDialog from './EditDialog/EditBookDialog.vue'
 import ConfirmDelete from './ConfirmDelete/ConfirmDelete.vue'
@@ -91,7 +91,7 @@ const isDeleteDialogOpen = ref(false)
 const isAddDialogOpen = ref(false)
 const selectedItem = ref(null)
 const selecteditemType = ref('')
-const $q = useQuasar()
+const { notifyInfo, notifySucess } = useNotify()
 const loading = ref(false)
 const error = ref(null)
 
@@ -140,24 +140,28 @@ const { mutate: updateBookMutation } = useMutation(UPDATE_BOOK, {
   onCompleted: () => loading.value = false,
 })
 
-const addBook = (bookData) => {
-  if(!bookData.title || !bookData.authorId){
-    $q.notify({
-      position: 'bottom-right',
-      color: 'negative',
-      message: 'Preencha todos os campos!',
-      icon: 'error'
-    });
-    console.log(bookData.title, bookData.authorId)
-    return;
+const addBook = (newBook) => {
+
+  const bookExist = books.value.some(
+    (book) => book.title.toLowerCase().trim() === newBook.title.toLowerCase().trim()
+  )
+
+  if(bookExist) {
+    notifyInfo({
+      message: 'Esse livro já está cadastrado!',
+    })
+    return
+  }
+  if(newBook.title.trim() === '') {
+    notifyInfo({
+      message: 'O nome do livro não pode ser vazio!',
+    })
+    return
   }
 
-  loading.value = true
-  error.value = null
-
    addBookMutation({
-    title: bookData.title,
-    authorId: bookData.authorId
+    title: newBook.title,
+    authorId: newBook.authorId
   }).then((result) => {
     if (result?.data?.createBook){
       books.value = [ ...books.value, {
@@ -168,13 +172,8 @@ const addBook = (bookData) => {
         }
       }]
     }
-    $q.notify({
-      position: 'bottom-right',
-      color: 'positive',
+    notifySucess({
       message: 'Livro adicionado com sucesso!',
-      icon: 'done',
-      classes: 'custom-notify',
-      iconSize: '30px'
     })
     loading.value = false
   }).catch((mutationError) => {
@@ -193,13 +192,8 @@ const deleteBooks = (book) => {
     books.value = books.value.filter((b) => b.id !== book.id)
   }
   loading.value = false
-  $q.notify({
-      position: 'bottom-right',
-      color: 'positive',
+  notifySucess({
       message: 'Livro deletado com sucesso!',
-      icon: 'done',
-      classes: 'custom-notify',
-      iconSize: '30px'
     })
   }).catch((mutationError) => {
     console.error('Erro ao deletar livro:', mutationError)
@@ -220,13 +214,8 @@ const updateBook = async (book) => {
     if(result?.data) {
     books.value = books.value.map((b) => b.id === result.data.updateBook.id ? result.data.updateBook : b)
   }
-  $q.notify({
-      position: 'bottom-right',
-      color: 'positive',
+  notifySucess({
       message: 'Livro atualizado com sucesso!',
-      icon: 'done',
-      classes: 'custom-notify',
-      iconSize: '30px'
     })
   return result
   }).catch((mutationError) => {
