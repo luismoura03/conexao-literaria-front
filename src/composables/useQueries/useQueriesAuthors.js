@@ -9,5 +9,12 @@ export function useAuthors() {
 
   const authors = computed(() => result.value?.authors || []);
 
-  return { authors, loading, error, refetch };
+  const authorsOptions = computed(() =>
+    authors.value.map((author) => ({
+      label: author.name,
+      value: author.id,
+    }))
+  );
+
+  return { authors, authorsOptions, loading, error, refetch };
 }
