@@ -24,7 +24,6 @@
         @editAuthor="openEditDialog"
         @deleteAuthor="openDeleteDialog"
       />
-
       <div v-if="loading">Carregando...</div>
       <div v-if="error">Erro ao buscar autores {{ error.message }}</div>
     </q-card-section>
@@ -51,14 +50,14 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { GET_AUTHORS } from '../graphql/queries/queriesAuthors/authorsQueries';
+import { ref } from 'vue';
 import {
   CREATE_AUTHOR,
   DELETE_AUTHOR,
   UPDATE_AUTHOR,
 } from '../graphql/mutations/mutationsAuthors/index';
-import { useQuery, useMutation } from '@vue/apollo-composable';
+import { useMutation } from '@vue/apollo-composable';
+import { useAuthors } from '../composables/useQueries/useQueriesAuthors';
 import useNotify from '../composables/notify/useNotify.js'
 import EditAuthorDialog from './EditDialog/EditAuthorDialog.vue';
 import AuthorsTable from './tables/AuthorsTable.vue';
@@ -71,7 +70,6 @@ const columns = [
   { name: 'actions', label: 'Ações', align: 'left' },
 ];
 
-const authors = ref([]);
 const editAuthorData = ref({ id: '', name: '' });
 const isEditDialogOpen = ref(false);
 const { notifyError, notifyInfo, notifyWarning, notifySucess } = useNotify();
@@ -79,14 +77,7 @@ const isDeleteDialogOpen = ref(false);
 const isAddDialogOpen = ref(false);
 const selectedItem = ref(null);
 const selecteditemType = ref('');
-const loading = ref(false);
-const error = ref(null);
-
-const { result: resultAuthors } = useQuery(GET_AUTHORS, null, {
-  fetchPolicy: 'network-only',
-  onError: (queryError) => (error.value = queryError),
-  onCompleted: () => (loading.value = false),
-});
+const { authors, error, loading, refetch} = useAuthors();
 
 const { mutate: addAuthorMutation } = useMutation(CREATE_AUTHOR, {
   onError: (mutationError) => {
@@ -111,15 +102,6 @@ const { mutate: updateAuthorMutation } = useMutation(UPDATE_AUTHOR, {
   },
   onCompleted: () => (loading.value = false),
 });
-
-watch(
-  () => resultAuthors.value,
-  (newAuthors) => {
-    if (newAuthors && newAuthors.authors) {
-      authors.value = newAuthors.authors;
-    }
-  }
-);
 
 const addAuthor = (newAuthor) => {
 
@@ -150,10 +132,11 @@ const addAuthor = (newAuthor) => {
         alert('Error');
       }
       if (result?.data?.createAuthor) {
-        authors.value = [...authors.value, result.data.createAuthor];
+        // authors.value = [...authors.value, result.data.createAuthor];
         notifySucess({
           message: 'Autor adicionado com sucesso!',
-        });
+        })
+        refetch()
       }
       closeAddDialog();
     })
@@ -173,12 +156,13 @@ const deleteAuthor = (author) => {
   })
     .then((result) => {
       if (result && result.data) {
-        authors.value = authors.value.filter((a) => a.id !== author.id);
+        // authors.value = authors.value.filter((a) => a.id !== author.id);
       }
       loading.value = false;
       notifySucess({
         message: 'Autor deletado com sucesso!',
-      });
+      })
+      refetch()
     })
     .catch((mutationError) => {
       console.error('Erro ao deletar autor:', mutationError);
@@ -206,16 +190,17 @@ const updateAuthor = (author) => {
   })
     .then((result) => {
       if (result && result.data) {
-        const updatedAuthor = result.data.updateAuthor;
-        authors.value = authors.value.map((a) =>
-          a.id === updatedAuthor.id ? updatedAuthor : a
-        );
+        // const updatedAuthor = result.data.updateAuthor;
+        // authors.value = authors.value.map((a) =>
+        //   a.id === updatedAuthor.id ? updatedAuthor : a
+        // );
         editAuthorData.value = { id: '', name: '' };
         isEditDialogOpen.value = false;
       }
       notifySucess({
         message: 'Autor atualizado com sucesso!',
-      });
+      })
+      refetch()
     })
     .catch((mutationError) => {
       notifyError({
