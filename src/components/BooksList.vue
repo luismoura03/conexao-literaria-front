@@ -117,6 +117,21 @@ const { mutate: updateBookMutation } = useMutation(UPDATE_BOOK, {
   onCompleted: () => loading.value = false,
 })
 
+watch(
+  () => useAuthors.value,
+  (newAuthors) => {
+    if(newAuthors && newAuthors.authors){
+      authors.value = newAuthors.authors
+      authorsOptions.value = newAuthors.authors.map(author => ({
+        value: author.id,
+        label: author.name
+
+      }))
+      console.log(useAuthors.value)
+    }
+  },
+)
+
 const addBook = (newBook) => {
 
   const bookExist = books.value.some(
@@ -269,20 +284,6 @@ const handleDelete = (book) => {
   closeDeleteDialog()
 }
 
-watch(
-  () => useAuthors.value,
-  (newAuthors) => {
-    if(newAuthors && newAuthors.authors){
-      authors.value = newAuthors.authors
-      authorsOptions.value = newAuthors.authors.map(author => ({
-        value: author.id,
-        label: author.name
-
-      }))
-      console.log(useAuthors.value)
-    }
-  },
-)
 //--------------------------------------------------------------------------------
 // close and save book dialog
 

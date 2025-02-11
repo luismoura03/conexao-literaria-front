@@ -72,7 +72,7 @@ const columns = [
 
 const editAuthorData = ref({ id: '', name: '' });
 const isEditDialogOpen = ref(false);
-const { notifyError, notifyInfo, notifyWarning, notifySucess } = useNotify();
+const { notifyError, notifyInfo, notifySucess } = useNotify();
 const isDeleteDialogOpen = ref(false);
 const isAddDialogOpen = ref(false);
 const selectedItem = ref(null);
@@ -177,7 +177,7 @@ const updateAuthor = (author) => {
   const originalAuthor = authors.value.find(a => a.id === author.id)
 
   if(originalAuthor.name.trim() === author.name.trim()) {
-    notifyWarning({
+    notifyInfo({
       message: 'Nenhuma alteração detectada no nome do autor.',
     })
     loading.value = false;
