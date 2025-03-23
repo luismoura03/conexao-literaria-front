@@ -3,12 +3,12 @@
     <q-card-section>
       <div class="header-container">
         <div class="text-header">
-          <div class="text-h6 q-mr-md">Lista de Livros</div>
+          <div class="text-h6 q-mr-md">{{ t('title.listBooks') }}</div>
         </div>
         <div class="add-book">
           <q-btn
               icon="add"
-              label="Adicionar Livro"
+              :label="t('actions.addBook')"
               color="positive"
               @click="openAddDialog()"
               class="q-mt-md"
@@ -26,8 +26,8 @@
         @deleteBook="openDeleteDialog"
       />
 
-      <div v-if="loading">Carregando...</div>
-      <div v-if="error">Erro ao buscar livros: {{ error.message }}</div>
+      <div v-if="loading">{{ t('loading') }}</div>
+      <div v-if="error">{{ t('noData') }} {{ error.message }}</div>
 
     </q-card-section>
     <EditBookDialog
@@ -66,14 +66,15 @@ import BooksTable from './tables/BooksTable.vue'
 import EditBookDialog from './EditDialog/EditBookDialog.vue'
 import ConfirmDelete from './ConfirmDelete/ConfirmDelete.vue'
 import AddBookDialog from './AddDialog/AddBookDialog.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const columns = [
   {name: 'id', label: 'ID', field: 'id', align: 'left'},
-  {name: 'title', label: 'Livros', field: 'title', align: 'left'},
-  {name: 'author', label: 'Autores', field: row => row.author?.name ?? 'Desconhecido', align:'left'},
-  {name: 'actions', label: 'Ações', align: 'left'}
+  {name: 'title', label: t('title.listBooks2'), field: 'title', align: 'left'},
+  {name: 'author', label: t('title.listAuthors2'), field: row => row.author?.name ?? 'Desconhecido', align:'left'},
+  {name: 'actions', label: t('actions.actions'), align: 'left'}
 ]
-
 const { authorsOptions } = useAuthors()
 const { notifyInfo, notifySucess } = useNotify()
 const { books, loading, error, refetch } = useBooks()

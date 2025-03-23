@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
     <q-toolbar>
-      <q-toolbar-title>Gerenciamento de Autores</q-toolbar-title>
+      <q-toolbar-title>{{ $t('title.managmentAuthors')}}</q-toolbar-title>
     </q-toolbar>
     <q-separator />
     <AuthorsList />

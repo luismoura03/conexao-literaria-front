@@ -3,19 +3,19 @@
     <q-card-section>
       <div class="header-table">
         <div class="text-header">
-          <div class="text-h6 q-mr-md">Lista de Autores</div>
+          <div class="text-h6 q-mr-md">{{ t('title.listAuthors') }}</div>
         </div>
         <div class="addAuthor">
           <q-btn
             icon="add"
-            label="Adicionar Autor"
+            :label="t('actions.addAuthor')"
             color="positive"
             @click="openAddDialog"
             class="q-mt-md"
           />
         </div>
       </div>
-      <q-separator></q-separator>
+      <q-separator />
     </q-card-section>
     <q-card-section>
       <AuthorsTable
@@ -24,8 +24,8 @@
         @editAuthor="openEditDialog"
         @deleteAuthor="openDeleteDialog"
       />
-      <div v-if="loading">Carregando...</div>
-      <div v-if="error">Erro ao buscar autores {{ error.message }}</div>
+      <div v-if="loading">{{ t('loading') }}</div>
+      <div v-if="error">{{ t('noData') }} {{ error.message }}</div>
     </q-card-section>
 
     <EditAuthorDialog
@@ -63,11 +63,13 @@ import EditAuthorDialog from './EditDialog/EditAuthorDialog.vue';
 import AuthorsTable from './tables/AuthorsTable.vue';
 import ConfirmDelete from './ConfirmDelete/ConfirmDelete.vue';
 import AddAuthorDialog from './AddDialog/AddAuthorDialog.vue';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const columns = [
   { name: 'id', label: 'ID', field: 'id', align: 'left' },
-  { name: 'name', label: 'Nome do Autor', field: 'name', align: 'left' },
-  { name: 'actions', label: 'Ações', align: 'left' },
+  { name: 'name', label: t('title.nameAuthor'), field: 'name', align: 'left' },
+  { name: 'actions', label: t('actions.actions'), align: 'left' },
 ];
 
 const editAuthorData = ref({ id: '', name: '' });
