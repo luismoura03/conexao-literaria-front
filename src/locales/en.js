@@ -1,0 +1,31 @@
+export default {
+  lib: "Library",
+  welcome: "Welcome to our application!",
+  actions: {
+    save: "Save",
+    cancel: "Cancel",
+    addAuthor: "Add Author",
+    addBook: "Add Book",
+    actions: "Actions",
+    create: "Create",
+  },
+  title: {
+    managmentAuthors: "Authors Management",
+    listAuthors: "Authors List",
+    listAuthors2: "Authors",
+    listBooks: "Books List",
+    listBooks2: "Books",
+    managmentBooks: "Books Management",
+    editAuthor: "Edit Author",
+    editBook: "Edit Book",
+    authors: "Authors",
+    nameAuthor: "Author's Name",
+    nameBook: "Book's Name",
+  },
+  placeholders: {
+    nameAuthor: "Author's Name",
+    nameBook: "Book's Name",
+  },
+  loading: "Loading...",
+  noData: "Error fetching books: ",
+};

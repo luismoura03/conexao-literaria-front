@@ -12,8 +12,9 @@
         />
 
         <q-toolbar-title>
-          Biblioteca
+          {{ $t('lib') }}
         </q-toolbar-title>
+        <LangSwitcher />
 
       </q-toolbar>
     </q-header>
@@ -47,6 +48,7 @@
 <script setup>
 import { ref } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
+import LangSwitcher from 'src/components/LangSwitcher.vue'
 
 const linksList = [
   {

@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
     <q-toolbar>
-      <q-toolbar-title>Gerenciamento de Livros</q-toolbar-title>
+      <q-toolbar-title>{{ $t('title.managmentBooks') }}</q-toolbar-title>
     </q-toolbar>
     <q-separator />
     <BooksList />

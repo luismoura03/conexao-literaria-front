@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <h1>Essa é a Pagina Inicial</h1>
+    <h1>{{ $t('welcome') }}</h1>
   </q-page>
 </template>
 
