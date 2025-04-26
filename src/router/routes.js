@@ -14,6 +14,11 @@ const routes = [
     component: () => import("layouts/MainLayout.vue"),
     children: [{ path: "", component: () => import("pages/AuthorsPage.vue") }],
   },
+  {
+    path: "/get-authors",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [{ path: "", component: () => import("pages/GetBooksAuthor.vue") }],
+  },
   // Always leave this as last one,
   // but you can also remove it
   {
