@@ -1,6 +1,7 @@
 export default {
     lib: "Biblioteca",
-    welcome: "Bem-vindo ao nosso aplicativo!",
+    welcome: "Bem-vindo ao conexão literaria!",
+    systemDev: "Sistema sendo desenvolvido por: Luis Moura",
     actions: {
       save: "Salvar",
       cancel: "Cancelar",
