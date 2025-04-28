@@ -22,12 +22,20 @@
         :books
         :columns
         :authors
+        :loading="loading"
         @editBook="openEditDialog"
         @deleteBook="openDeleteDialog"
       />
 
-      <div v-if="loading">{{ t('loading') }}</div>
-      <div v-if="error">{{ t('noData') }} {{ error.message }}</div>
+      <div v-if="error" class="flex flex-center q-my-lg column items-center">
+        <q-icon name="error" color="negative" size="40px" />
+        <div class="q-mt-sm text-negative text-weight-medium">
+          {{ 'Erro ao carregar Livros' }}
+        </div>
+        <div class="text-caption text-grey-7 q-mt-xs">
+          {{ error.message }}
+        </div>
+      </div>
 
     </q-card-section>
     <EditBookDialog

@@ -3,6 +3,7 @@
     <q-table
       :rows="authors"
       :columns="columns"
+      :loading
       flat
       bordered
     >
@@ -29,6 +30,7 @@
           </div>
         </q-td>
       </template>
+      
     </q-table>
   </div>
 </template>
@@ -39,7 +41,8 @@
 
 defineProps({
   authors: Array,
-  columns: Array
+  columns: Array,
+  loading: Boolean
 })
 
 defineEmits(['editAuthor', 'deleteAuthor'])

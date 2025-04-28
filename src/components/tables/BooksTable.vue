@@ -3,6 +3,7 @@
     :rows="books"
     :columns="columns"
     row-key="id"
+    :loading="loading"
     flat
     bordered
   >
@@ -38,7 +39,8 @@ import {defineProps, defineEmits, computed} from 'vue'
 const props = defineProps({
     books: Array,
     columns: Array,
-    authors: Array
+    authors: Array,
+    loading: Boolean
 })
 
 const emit = defineEmits(['editBook', 'deleteBook'])
