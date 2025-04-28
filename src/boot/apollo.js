@@ -7,7 +7,7 @@ import {
 import { provideApolloClient } from "@vue/apollo-composable";
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:3000/",
+  uri: import.meta.env.VITE_GRAPHQL_API_URL,
 });
 
 const cache = new InMemoryCache();
