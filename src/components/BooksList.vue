@@ -8,7 +8,7 @@
         <div class="add-book">
           <q-btn
               icon="add"
-              :label="$q.screen.gt.xs ? t('actions.addAuthor') : ''"
+              :label="$q.screen.gt.xs ? t('actions.addBook') : ''"
               color="positive"
               @click="openAddDialog()"
               class="q-mt-md"
