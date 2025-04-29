@@ -19,7 +19,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Netlify
-        uses: netlify/actions-cli@v2
+        run: netlify deploy --prod --dir=dist
         with:
           args: deploy --prod --dir=dist
         env:
