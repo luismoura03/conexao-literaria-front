@@ -11,9 +11,9 @@
         <div class="q-mt-md">
           <q-btn
             color="primary"
-            icon="people"
-            label="Ver Autores"
-            to="/authors"
+            icon="books"
+            label="Ver Livros"
+            to="/books"
             class="full-width"
             unelevated
           />
@@ -24,5 +24,5 @@
 </template>
 
 <script setup>
-// Nenhum script necessário para apresentação
+//
 </script>
