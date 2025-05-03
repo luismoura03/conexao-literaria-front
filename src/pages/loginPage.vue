@@ -5,8 +5,8 @@
         <div class="login-form q-pa-md">
           <div class="text-center q-mb-lg">
             <q-icon name="auto_stories" size="48px" color="primary" />
-            <h4 class="q-mb-xs q-mt-sm">Bem-vindo de volta</h4>
-            <p class="text-grey-7">Entre com suas credenciais para continuar</p>
+            <h4 class="q-mb-lg q-mt-sm">Bem-vindo de volta</h4>
+            <p class="q-pb-md text-grey-7">Entre com suas credenciais para continuar</p>
           </div>
           
           <q-form @submit="handleLogin" class="q-gutter-md">
@@ -29,13 +29,20 @@
               label="Senha" 
               filled
               rounded
-              type="password"
+              :type="isPwdVisible ? 'text' : 'password'"
               class="input-style"
               bottom-slots
               :rules="[val => !!val || 'Senha é obrigatória']"
             >
               <template v-slot:prepend>
                 <q-icon name="lock" color="primary" />
+              </template>
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwdVisible ? 'visibility' : 'visibility_off'"
+                  @click="isPwdVisible = !isPwdVisible"
+                  class="cursor-pointer"
+                />
               </template>
             </q-input>
             
@@ -76,6 +83,7 @@ const { login, loading } = useLoginUser();
 const user = ref('');
 const password = ref('');
 const rememberMe = ref(false);
+const isPwdVisible = ref(false);
 
 const handleLogin = async () => {
   if (!user.value || !password.value) return;

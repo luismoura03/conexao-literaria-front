@@ -82,7 +82,9 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from 'src/stores/authStore';
 import EssentialLink from 'components/EssentialLink.vue';
+import { useQuasar } from 'quasar';
 
+const $q = useQuasar();
 const { locale } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
@@ -98,8 +100,21 @@ function changeLanguage(lang) {
 }
 
 function logout() {
-  authStore.logout();
-  router.push('/');
+  try {
+    const success = authStore.logout()
+    if (success) {
+      $q.notify({
+        message: 'Logout realizado com sucesso!',
+        color: 'positive'
+      });
+      router.push('/');
+    }
+  } catch (error) {
+    $q.notify({
+      message: 'Erro ao realizar logout: ' + error.message,
+      color: 'negative'
+    });
+  }
 }
 
 const linksList = [

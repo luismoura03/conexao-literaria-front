@@ -8,6 +8,7 @@ export default {
     addAuthor: "Add Author",
     addBook: "Add Book",
     actions: "Actions",
+    logout: "Logout",
     create: "Create",
   },
   title: {

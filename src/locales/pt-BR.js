@@ -9,6 +9,7 @@ export default {
       addBook: "Adicionar Livro",
       actions: "Ações",
       create: "Criar",
+      logout: "Sair",
     },
     title: {
       managmentAuthors: "Gerenciamento de Autores",

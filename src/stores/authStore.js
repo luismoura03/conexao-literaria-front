@@ -1,32 +1,41 @@
 import { defineStore } from 'pinia';
+import { useApolloClient } from '@vue/apollo-composable';
+import { LOGOUT_USER } from '../graphql/mutations/users/users';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: localStorage.getItem('token') || null,
-    user: JSON.parse(localStorage.getItem('user') || 'null')
+    user: JSON.parse(sessionStorage.getItem('user') || 'null')
   }),
   
   getters: {
-    isAuthenticated: (state) => !!state.token,
+    isAuthenticated: (state) => !!state.user,
     username: (state) => state.user?.username || '',
     role: (state) => state.user?.role || 'guest'
   },
   
   actions: {
-    login(token, user) {
-      this.token = token;
+    login(user) {
       this.user = user;
       
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('user', JSON.stringify(user));
     },
     
-    logout() {
-      this.token = null;
-      this.user = null;
-      
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+    async logout() {
+      const { client } = useApolloClient();
+
+      try {
+        await client.mutate({
+          mutation: LOGOUT_USER
+        });
+
+        this.user = null;
+        sessionStorage.removeItem('user');
+
+        return true;
+      } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+        return false;
+      }
     }
   }
 });

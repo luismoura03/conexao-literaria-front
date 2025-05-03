@@ -17,6 +17,7 @@
     "@apollo/client": "^3.12.6",
     "@quasar/extras": "^1.16.4",
     "@vue/apollo-composable": "^4.2.1",
+    "canvas-confetti": "^1.9.3",
     "gitmoji-cli": "^9.5.0",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
