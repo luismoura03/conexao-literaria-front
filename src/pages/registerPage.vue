@@ -189,14 +189,7 @@
               rounded
               unelevated
             />
-            <q-btn
-            type="submit"
-            label="testar confete"
-            @click="confettiShower"
-            />
 
-            
-            
             <div class="text-center q-mt-sm">
               <p>Já tem uma conta? 
                 <q-btn flat color="primary" label="Entre aqui" to="/" />
