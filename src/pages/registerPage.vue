@@ -189,6 +189,13 @@
               rounded
               unelevated
             />
+            <q-btn
+            type="submit"
+            label="testar confete"
+            @click="confettiShower"
+            />
+
+            
             
             <div class="text-center q-mt-sm">
               <p>Já tem uma conta? 
@@ -218,7 +225,7 @@ const firstName = ref('');
 const lastName = ref('');
 const isPwdVisible = ref(false);
 const isConfirmPwdVisible = ref(false);
-const { confettiRain } = useConfetti();
+const { confettiShower } = useConfetti();
 
 const passwordStrength = computed(() => {
   let score = 0;
@@ -283,7 +290,7 @@ const handleRegister = async () => {
   
   try {
     await register(user.value, password.value, email.value, firstName.value, lastName.value);
-    confettiRain();
+    confettiShower();
   } catch (error) {
     notifyError({ 
       message: 'Falha no registro: ' + (error.message || 'Usuário já existe ou dados inválidos')
