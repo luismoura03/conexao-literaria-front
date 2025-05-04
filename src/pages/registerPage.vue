@@ -296,7 +296,7 @@ const handleRegister = async () => {
     .register-page {
       height: 100vh;
       width: 100%;
-      overflow: hidden;
+      overflow-y: auto;
     }
 
     .illustration-col {
@@ -331,7 +331,7 @@ const handleRegister = async () => {
     }
 
     @media (max-width: 768px) {
-      .login-page {
+      .register-page {
         overflow-y: auto;
       }
       
