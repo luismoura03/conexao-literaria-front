@@ -7,7 +7,7 @@ import {
 import { provideApolloClient } from "@vue/apollo-composable";
 
 const httpLink = createHttpLink({
-  uri: "https://conexao-literaria-back.onrender.com/graphql",
+  uri: import.meta.env.VITE_GRAPHQL_API_URL,
   credentials: "include",
 });
 
